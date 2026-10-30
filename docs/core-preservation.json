@@ -1,0 +1,130 @@
+{
+  "method": "Byte-for-byte comparison against supplied HSSE source ZIP. Excludes UI; does not prove live backend behavior.",
+  "files": [
+    {
+      "file": "src/lib/auth.ts",
+      "byteIdentical": true,
+      "sha256": "5c61aacd0fea7f57c89ea17c525d75c37ba6b5936738393c0df5964cd82e1674"
+    },
+    {
+      "file": "src/lib/guards.ts",
+      "byteIdentical": true,
+      "sha256": "862eea5f68eb191f74ee12eb8978307e3450a109b51bddcca2e95e3323d3f369"
+    },
+    {
+      "file": "src/lib/http.ts",
+      "byteIdentical": true,
+      "sha256": "a409960e3f0ab69007b7e680f60684dc541ef04143e19abc93d61a24f241e6b1"
+    },
+    {
+      "file": "src/lib/rbac.ts",
+      "byteIdentical": true,
+      "sha256": "e550d6efff0e90e48ed80c2a6ad445eedab2cf5ea887f1e74efff522958d340f"
+    },
+    {
+      "file": "src/lib/session-access.ts",
+      "byteIdentical": true,
+      "sha256": "fa709754d4d279cc567825aed744e3e5a0487ace68c2a73cb0f7d5528443eb50"
+    },
+    {
+      "file": "src/lib/token-rotation.ts",
+      "byteIdentical": true,
+      "sha256": "acfb86584a0c0a3ecf6e937a61577128e73677607420e477722ee6c099611076"
+    },
+    {
+      "file": "src/lib/utils.ts",
+      "byteIdentical": true,
+      "sha256": "addb0bf35d6875686fb8af9f6b0b62a2148e9ef6b1bd02c04de9116732867eb6"
+    },
+    {
+      "file": "src/features/auth/api.ts",
+      "byteIdentical": true,
+      "sha256": "fcafacf7c9e96aefb16687f8bde19d06987fa93811451dfc34c88cda01269f11"
+    },
+    {
+      "file": "src/features/auth/backend-profile.ts",
+      "byteIdentical": true,
+      "sha256": "1022df3240b4a17da2c26adde724658b36204b496aef912c5a72003978a6a978"
+    },
+    {
+      "file": "src/features/auth/schemas.ts",
+      "byteIdentical": true,
+      "sha256": "4eb3f8a604d5fd51ff357314d19fd50665dbb2ba03834f5051da72a31bb1b509"
+    },
+    {
+      "file": "src/features/auth/types.ts",
+      "byteIdentical": true,
+      "sha256": "b23308bf79a8888b4171c5072814bd0555c96b1246d9aa06a36e1e202c6accac"
+    },
+    {
+      "file": "src/features/employees/api.ts",
+      "byteIdentical": true,
+      "sha256": "05f8af6c8032fd0d58dec54965de082c83d945b20eb7e1f628980ca23a9d2c5b"
+    },
+    {
+      "file": "src/features/employees/schemas.ts",
+      "byteIdentical": true,
+      "sha256": "4673e537cd53b1d501bf83fbeece8326bd12794cc016fafac61d69aba104fc9c"
+    },
+    {
+      "file": "src/app/api/auth/[...nextauth]/route.ts",
+      "byteIdentical": true,
+      "sha256": "067d3b2e3e076ed6029e9d674c70c8458e7e3140b33922b22843cf957c3be8d4"
+    },
+    {
+      "file": "src/app/api/gateway/[...path]/route.ts",
+      "byteIdentical": true,
+      "sha256": "65f8989c33082c09a6a6fbdeaed770f2e74b00c1039fb5852e4b51b0e364dde5"
+    },
+    {
+      "file": "src/app/api/session/logout/route.ts",
+      "byteIdentical": true,
+      "sha256": "99657b87e03c91e7f00722fd262e519e6efe647c7d504978bdf1960bfde70cfa"
+    },
+    {
+      "file": "src/config/env.ts",
+      "byteIdentical": true,
+      "sha256": "cb09f96e411de1025121f8189ee5f981e71e889988f3c650b82836d9f69e66e7"
+    },
+    {
+      "file": "src/config/nav.ts",
+      "byteIdentical": true,
+      "sha256": "38eba7becfecbbcd24e5d42a50ceb439429c46f48cab7ba85b70ad953fa0b073"
+    },
+    {
+      "file": "src/providers/query-provider.tsx",
+      "byteIdentical": true,
+      "sha256": "120187e27eddfb34d7fa55afb1880887197e79bd647714555ce5f6a2a63dc3c2"
+    },
+    {
+      "file": "src/providers/session-provider.tsx",
+      "byteIdentical": true,
+      "sha256": "94758696f933ebf27780eeff38086f29d852aed78ff2cfde3f185bbb5b5aaf76"
+    },
+    {
+      "file": "src/components/auth/permission-gate.tsx",
+      "byteIdentical": true,
+      "sha256": "0fc7bfd9abafda129766c27f042625ffa88bfe8a189cd29e8a7b437f109a8c72"
+    },
+    {
+      "file": "src/features/users/types.ts",
+      "byteIdentical": true,
+      "sha256": "4ed817d23615639fb64e53d67ed815604d429d98e1c19d0752c240ac06705423"
+    },
+    {
+      "file": "src/types/api.ts",
+      "byteIdentical": true,
+      "sha256": "3136b4f6b270aefc4ad5362316fc9067958b58a07ce950a8b5e40675e80c1d91"
+    },
+    {
+      "file": "src/types/index.ts",
+      "byteIdentical": true,
+      "sha256": "86862f9e8fb6d4dd49c64c2131f0c2856bee5851ea06db8d67b2edbee1636218"
+    },
+    {
+      "file": "src/types/next-auth.d.ts",
+      "byteIdentical": true,
+      "sha256": "d08bc70694b27afd28efd75bbe4e5f38e41fe171f8932928b5b9d1c127561b53"
+    }
+  ]
+}

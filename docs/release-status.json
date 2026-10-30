@@ -1,0 +1,16 @@
+{
+  "version": "1.3.0",
+  "source": "user-supplied latest HSSE ZIP + TailAdmin Free ZIP",
+  "corePreservedFiles": 25,
+  "unitTests": {
+    "passed": 12,
+    "failed": 0
+  },
+  "typecheck": "pass",
+  "build": "pass",
+  "unauthenticatedBrowserSmokeGroups": 7,
+  "isolatedVisualHarnessGroups": 10,
+  "liveAuthenticatedBackendTested": false,
+  "productionReady": false,
+  "audit": "Historical audit-production.json retained; no new dependency audit in redesign"
+}

@@ -1,0 +1,17 @@
+{
+  "pass": true,
+  "scope": "Isolated component harness only; synthetic QA session/data outside shipped application. No live auth or CRUD.",
+  "checks": [
+    "Dashboard, empty and populated Employees contained at 1440",
+    "Dashboard, empty and populated Employees contained at 1280",
+    "Dashboard, empty and populated Employees contained at 768",
+    "Dashboard, empty and populated Employees contained at 390",
+    "Create form contains all original fields without page overflow",
+    "Disable opens accessible confirmation; cancel makes no mutation",
+    "Profile dialog contains effective permissions",
+    "Mobile navigation locks background, closes on Escape and restores it",
+    "Error, loading, denied, pending module and forbidden states contained",
+    "Desktop sidebar collapses to 90px"
+  ],
+  "browserErrors": []
+}
