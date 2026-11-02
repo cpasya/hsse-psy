@@ -43,7 +43,7 @@ export function ReferenceSelect({
                 ? error
                 : !items.length
                     ? "Belum ada referensi yang dapat dipilih."
-                    : "Pilih nama; aplikasi mengirim UUID ke backend.";
+                    : "";
 
     return (
         <div className="field">

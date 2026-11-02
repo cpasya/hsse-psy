@@ -519,8 +519,8 @@ export function PermissionEditor({
             </h2>
 
             <p className="muted">
-                Membuat kode permission tidak otomatis membuat
-                fitur baru atau memberi izin kepada role.
+                Inget bro : Membuat permission ini engga otomatis ngebuat
+                fitur baru atau ngasih izin ke role.
             </p>
 
             <form

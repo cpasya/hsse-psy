@@ -259,10 +259,10 @@ function AccessCard({
 
       {!canManage ? (
         <>
-          <p className="muted access-note">
+          {/* <p className="muted access-note">
             Hak akses hanya dapat diubah dengan employees.update dan
             permissions.read. Akun sendiri selalu read-only.
-          </p>
+          </p> */}
           <ExistingPermissions employee={employee} />
         </>
       ) : catalogueLoading ? (

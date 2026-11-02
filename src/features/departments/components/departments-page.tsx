@@ -336,7 +336,7 @@ export function DepartmentsPage() {
             <h2>{editing ? "Edit department" : "Tambah department"}</h2>
           </DialogTitle>
           <DialogDescription>
-            Nama department akan digunakan sebagai referensi employee.
+            Nama department untuk referensi employee.
           </DialogDescription>
 
           <form className="dialog-form" onSubmit={submit}>

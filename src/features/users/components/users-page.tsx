@@ -875,12 +875,12 @@ export function UsersPage(
             </h2>
           </DialogTitle>
 
-          <DialogDescription>
-            Department memakai data backend.
+          {/* <DialogDescription>
+            Inget bro: Department memakai data backend.
             Job Position masih menggunakan UUID
             sesuai kontrak saat ini. Password awal
             dibuat oleh backend.
-          </DialogDescription>
+          </DialogDescription> */}
 
           <form
             key={editing?.id ?? "new"}
@@ -928,13 +928,13 @@ export function UsersPage(
                     autoComplete="off"
                   />
 
-                  {editing && (
+                  {/* {editing && (
                     <small>
                       Perubahan email tidak
                       didukung kontrak PATCH
                       saat ini.
                     </small>
-                  )}
+                  )} */}
                 </div>
 
                 <div className="field">
@@ -1070,9 +1070,7 @@ export function UsersPage(
                   />
 
                   <small>
-                    Masih UUID manual sampai
-                    endpoint master Job Position
-                    dikonfirmasi.
+                    Masih UUID manual, otw select-option.
                   </small>
                 </div>
               </div>
