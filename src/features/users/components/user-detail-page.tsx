@@ -347,12 +347,12 @@ function AccessCard({
             )}
           </div>
 
-          <p className="muted access-note">
+          {/* <p className="muted access-note">
             PUT mengganti seluruh daftar: {original.length} existing →{" "}
             {selected.length} dipilih. Daftar kosong mencabut seluruh akses.
-          </p>
+          </p> */}
 
-          <div className="dialog-actions">
+          <div className="dialog-actions mt-6">
             <Button
               variant="outline"
               disabled={!changed || saving}

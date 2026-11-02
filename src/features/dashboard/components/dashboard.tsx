@@ -49,7 +49,7 @@ export function Dashboard({ data }: { data?: DashboardSnapshot }) {
       </div>
       {!data && (
         <div className="notice" role="status">
-          Sumber data dashboard belum dihubungkan.
+          Sumber data dashboard belum dihubungkan. Mohon bersabar ya.. hehee
         </div>
       )}
       <div className="metrics-grid">

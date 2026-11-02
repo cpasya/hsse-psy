@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
   createEmployeeSchema,
@@ -42,6 +43,21 @@ const me = {
   createdAt: "2026-10-25T00:00:00.000Z",
   updatedAt: "2026-10-25T00:00:00.000Z",
 };
+
+test("Zod resolver maps login validation errors", async () => {
+  const result = await zodResolver(loginSchema)(
+    { email: "invalid", password: "" },
+    undefined,
+    {
+      criteriaMode: "firstError",
+      fields: {},
+      shouldUseNativeValidation: false,
+    },
+  );
+
+  assert.equal(result.errors.email?.message, "Email tidak valid");
+  assert.equal(result.errors.password?.message, "Password wajib diisi");
+});
 
 test(
   "Initial password change enforces strength and confirmation",
