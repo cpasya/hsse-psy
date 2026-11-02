@@ -6,7 +6,13 @@ import { ShieldCheck, LockKeyhole } from "lucide-react";
 
 export default async function LoginPage() {
   const session = await getServerSession(authOptions);
-  if (session && !session.error) redirect("/dashboard");
+  if (session && !session.error) {
+    redirect(
+      session.user.mustachePassword
+        ? "/change-password"
+        : "/dashboard",
+    );
+  }
   return (
     <main className="login-layout">
       <section className="login-form-area" aria-labelledby="login-title">

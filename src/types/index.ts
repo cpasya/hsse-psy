@@ -1,19 +1,3 @@
-export const roles = [
-  "super_admin",
-  "admin",
-  "hsse_officer",
-  "supervisor",
-  "viewer",
-] as const;
-export type Role = (typeof roles)[number];
-export const roleLabels: Record<Role, string> = {
-  super_admin: "Super Admin",
-  admin: "Admin",
-  hsse_officer: "HSSE Officer",
-  supervisor: "Supervisor",
-  viewer: "Viewer",
-};
-
 export const knownPermissions = [
   "employees.read",
   "employees.create",

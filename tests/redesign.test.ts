@@ -39,3 +39,25 @@ test("TailAdmin adaptation retains notices, responsive and keyboard foundations"
   assert.ok(themeToggle.includes('localStorage.setItem(storageKey'));
   assert.ok(themeToggle.includes('aria-pressed={dark}'));
 });
+
+test("Dashboard modals share smooth accessible transitions", () => {
+  const css = readFileSync("src/app/globals.css", "utf8");
+  const users = readFileSync(
+    "src/features/users/components/users-page.tsx",
+    "utf8",
+  );
+  const access = readFileSync(
+    "src/features/access/components/access-page.tsx",
+    "utf8",
+  );
+
+  assert.ok(css.includes('.modal-overlay[data-state="open"]'));
+  assert.ok(css.includes('.modal-overlay[data-state="closed"]'));
+  assert.ok(css.includes('.modal-content[data-state="open"]'));
+  assert.ok(css.includes('.modal-content[data-state="closed"]'));
+  assert.ok(css.includes("@keyframes modal-content-in"));
+  assert.ok(css.includes("prefers-reduced-motion"));
+  assert.ok(users.includes('className="employee-form-modal"'));
+  assert.ok(access.includes('className="access-editor-modal"'));
+  assert.ok(existsSync(".cursor/rules/modal-ux.mdc"));
+});

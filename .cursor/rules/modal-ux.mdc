@@ -1,0 +1,14 @@
+---
+description: Keep dashboard dialogs consistent, accessible, and smoothly animated
+globs: src/**/*.{tsx,css}
+alwaysApply: false
+---
+
+# Modal UX
+
+- Use `Dialog` and `DialogContent` from `src/components/ui/dialog.tsx` for Add/Edit forms and other non-destructive dialogs.
+- Use `ConfirmDialog` for destructive or replacement confirmation.
+- Reuse the shared `.modal-overlay` and `.modal-content` transitions; do not build feature-specific overlays or animation state.
+- Keep loading, validation, permission checks, and mutation logic inside the feature. A modal is presentation, not authorization.
+- Disable repeat submission while a mutation is pending and keep keyboard focus, Escape, close button, mobile layout, and `prefers-reduced-motion` accessible.
+- Avoid nested modals. Keep secondary confirmation flows inline or outside the parent dialog.

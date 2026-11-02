@@ -16,14 +16,14 @@ export function toFrontendProfile(
     status: user.status,
     isActive: user.status === "active",
 
-    roleId: user.roleId,
-    departmentId: user.departmentId,
-    jobPositionId: user.jobPositionId,
-    locationId: user.locationId,
+    roleId: user.roleId ?? null,
+    departmentId: user.departmentId ?? null,
+    jobPositionId: user.jobPositionId ?? null,
+    locationId: user.locationId ?? null,
 
     mustachePassword: user.mustachePassword,
 
-    // Hilangkan duplikat tanpa menambah permission apa pun.
+    //Ini untuk hilangkan duplikat tanpa menambah permission apa pun.
     permissions: [...new Set(user.permissions)].sort(),
 
     createdAt: user.createdAt,

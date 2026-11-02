@@ -31,6 +31,7 @@ function deny(
 export async function loadEffectiveToken(
     input: JWT,
     forceRefresh = false,
+    forceProfile = forceRefresh,
 ): Promise<JWT> {
     if (!input.profile?.id || !input.refreshToken) {
         return {
@@ -66,6 +67,7 @@ export async function loadEffectiveToken(
         try {
             profile = await getProfile(
                 token.accessToken,
+                forceProfile,
             );
         } catch (error) {
             // Access token mungkin ditolak sebelum expiry lokal.
@@ -87,6 +89,7 @@ export async function loadEffectiveToken(
 
             profile = await getProfile(
                 token.accessToken,
+                true,
             );
         }
 

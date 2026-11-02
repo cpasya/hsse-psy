@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import { QueryProvider } from "@/providers/query-provider";
-import { SessionProvider } from "@/providers/session-provider";
 import { Toaster } from "sonner";
 import "./globals.css";
 export const metadata: Metadata = {
   title: { default: "HSSE · Management System", template: "%s | HSSE" },
-  description: "K3, Keamanan & Lingkungan — workspace operasional HSSE",
+  description: "Dahboard bikinan pasya ganteng — workspace operasional HSSE",
 };
 
 const themeScript = `
@@ -28,9 +27,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body>
-        <SessionProvider>
-          <QueryProvider>{children}</QueryProvider>
-        </SessionProvider>
+        <QueryProvider>{children}</QueryProvider>
         <Toaster richColors position="bottom-right" />
       </body>
     </html>

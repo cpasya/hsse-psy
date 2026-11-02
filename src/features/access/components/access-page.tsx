@@ -9,6 +9,11 @@ import {
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { Forbidden } from "@/components/shared/module-placeholder";
 
@@ -96,6 +101,7 @@ function AccessContent({
     });
 
     const [editor, setEditor] = useState<Editor | null>(null);
+    const [editorOpen, setEditorOpen] = useState(false);
     const [target, setTarget] = useState<Row | null>(null);
     const [busy, setBusy] = useState(false);
 
@@ -108,6 +114,29 @@ function AccessContent({
     const protectedRow = (row: Row) =>
         row.isSystem ||
         (resource === "roles" && row.id === user.roleId);
+
+    const editorUsesModal = !!editor && (
+        resource === "permissions" ||
+        editor.mode === "new" ||
+        editor.mode === "edit"
+    );
+
+    function openEditor(next: Editor) {
+        setEditor(next);
+        setEditorOpen(
+            resource === "permissions" ||
+            next.mode === "new" ||
+            next.mode === "edit",
+        );
+    }
+
+    function closeEditor() {
+        if (editorUsesModal) {
+            setEditorOpen(false);
+        } else {
+            setEditor(null);
+        }
+    }
 
     const query = useQuery({
         queryKey: [
@@ -152,7 +181,7 @@ function AccessContent({
     }, [query.data]);
 
     async function refresh() {
-        setEditor(null);
+        closeEditor();
         setTarget(null);
 
         await Promise.all([
@@ -228,6 +257,37 @@ function AccessContent({
         query.isFetching ||
         search.trim() !== filters.search;
 
+    const editorContent = editor
+        ? resource === "roles"
+            ? (
+                <RoleEditor
+                    key={`${editor.id}:${editor.mode}`}
+                    id={editor.id}
+                    mode={editor.mode}
+                    user={user}
+                    onClose={closeEditor}
+                    onSaved={saved}
+                />
+            )
+            : (
+                <PermissionEditor
+                    key={editor.id ?? "new"}
+                    record={editor.record}
+                    user={user}
+                    onClose={closeEditor}
+                    onSaved={saved}
+                />
+            )
+        : null;
+
+    const editorTitle = resource === "roles"
+        ? editor?.mode === "new"
+            ? "Tambah role"
+            : "Edit role"
+        : editor?.record
+            ? "Edit permission"
+            : "Tambah permission";
+
     return (
         <>
             <div className="page-heading">
@@ -245,9 +305,12 @@ function AccessContent({
 
                 {allowed("create") && (
                     <Button
-                        disabled={!!editor}
+                        disabled={
+                            !!editor &&
+                            (!editorUsesModal || editorOpen)
+                        }
                         onClick={() =>
-                            setEditor({
+                            openEditor({
                                 id: null,
                                 mode: "new",
                                 record: null,
@@ -383,7 +446,7 @@ function AccessContent({
                                                         <Button
                                                             variant="outline"
                                                             onClick={() =>
-                                                                setEditor({
+                                                                openEditor({
                                                                     id: row.id,
                                                                     mode: "view",
                                                                     record: null,
@@ -399,7 +462,7 @@ function AccessContent({
                                                             <Button
                                                                 variant="outline"
                                                                 onClick={() =>
-                                                                    setEditor({
+                                                                    openEditor({
                                                                         id: row.id,
                                                                         mode: "edit",
                                                                         record:
@@ -420,7 +483,7 @@ function AccessContent({
                                                             <Button
                                                                 variant="outline"
                                                                 onClick={() =>
-                                                                    setEditor({
+                                                                    openEditor({
                                                                         id: row.id,
                                                                         mode: "assign",
                                                                         record: null,
@@ -514,26 +577,22 @@ function AccessContent({
                 )}
             </section>
 
-            {editor && (
-                resource === "roles" ? (
-                    <RoleEditor
-                        key={`${editor.id}:${editor.mode}`}
-                        id={editor.id}
-                        mode={editor.mode}
-                        user={user}
-                        onClose={() => setEditor(null)}
-                        onSaved={saved}
-                    />
-                ) : (
-                    <PermissionEditor
-                        key={editor.id ?? "new"}
-                        record={editor.record}
-                        user={user}
-                        onClose={() => setEditor(null)}
-                        onSaved={saved}
-                    />
-                )
-            )}
+            {editorUsesModal ? (
+                <Dialog
+                    open={editorOpen}
+                    onOpenChange={(open) => {
+                        if (!open) setEditorOpen(false);
+                    }}
+                >
+                    <DialogContent className="access-editor-modal">
+                        <DialogTitle className="sr-only">
+                            {editorTitle}
+                        </DialogTitle>
+
+                        {editorContent}
+                    </DialogContent>
+                </Dialog>
+            ) : editorContent}
 
             <ConfirmDialog
                 open={!!target}

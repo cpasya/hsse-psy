@@ -1,4 +1,3 @@
-import type { Role } from "@/types";
 // Normalized UI/session profile, not the raw backend Employee response.
 export interface UserDTO {
   id: string;

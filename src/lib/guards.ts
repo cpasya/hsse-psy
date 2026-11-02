@@ -1,10 +1,11 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import { cache } from "react";
 
 import { authOptions } from "./auth";
 import { can } from "./rbac";
 
-export async function requireSession() {
+export const requireSession = cache(async function requireSession() {
   const session = await getServerSession(
     authOptions,
   );
@@ -26,7 +27,7 @@ export async function requireSession() {
   }
 
   return session;
-}
+});
 
 export async function requirePermission(
   permission: string,

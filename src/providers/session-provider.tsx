@@ -4,6 +4,7 @@ import {
   SessionProvider as Provider,
   useSession,
 } from "next-auth/react";
+import type { Session } from "next-auth";
 
 import {
   useEffect,
@@ -47,11 +48,14 @@ function AccessSync() {
 
 export function SessionProvider({
   children,
+  session,
 }: {
   children: React.ReactNode;
+  session?: Session | null;
 }) {
   return (
     <Provider
+      session={session}
       refetchInterval={60}
       refetchOnWindowFocus
       refetchWhenOffline={false}

@@ -84,7 +84,10 @@ try {
   checks.push("Legacy worker asset absent");
   for (const route of [
     "/dashboard",
+    "/change-password",
+    "/departments",
     "/users",
+    "/users/00000000-0000-4000-8000-000000000001",
     "/incident",
     "/incident/new",
     "/incident/unknown",

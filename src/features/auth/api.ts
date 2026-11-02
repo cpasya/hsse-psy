@@ -3,8 +3,10 @@ import "server-only";
 import { z } from "zod";
 
 import { serverEnv } from "@/config/env";
+import { cachedProfile } from "@/lib/profile-cache";
 
 import { authTokensSchema } from "./schemas";
+import type { ChangePasswordInput } from "./schemas";
 import { toFrontendProfile } from "./backend-profile";
 
 import type { UserDTO } from "@/features/users/types";
@@ -114,19 +116,29 @@ async function authRequest(
 
 export async function getProfile(
   accessToken: string,
+  force = false,
 ): Promise<UserDTO> {
-  const raw = await authRequest("/me", {
-    bearer: accessToken,
-  });
+  return cachedProfile(accessToken, async () => {
+    const raw = await authRequest("/me", {
+      bearer: accessToken,
+    });
 
-  try {
-    return toFrontendProfile(raw);
-  } catch {
-    throw new AuthApiError(
-      502,
-      "Format profil/permissions backend tidak sesuai kontrak",
-    );
-  }
+    try {
+      return toFrontendProfile(raw);
+    } catch (error) {
+      const fields = error instanceof z.ZodError
+        ? error.issues
+          .map((issue) => issue.path.join("."))
+          .filter(Boolean)
+          .join(", ")
+        : "tidak diketahui";
+
+      throw new AuthApiError(
+        502,
+        `Format profil/permissions backend tidak sesuai kontrak (${fields})`,
+      );
+    }
+  }, force);
 }
 
 export async function logout(
@@ -135,6 +147,20 @@ export async function logout(
   await authRequest("/auth/sign-out", {
     method: "POST",
     bearer: refreshToken,
+  });
+}
+
+export async function changePassword(
+  accessToken: string,
+  payload: ChangePasswordInput,
+): Promise<void> {
+  await authRequest("/auth/change-password", {
+    method: "POST",
+    bearer: accessToken,
+    body: {
+      password: payload.password,
+      confirm_password: payload.confirmPassword,
+    },
   });
 }
 

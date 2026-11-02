@@ -16,6 +16,7 @@ interface Props {
     error: string | null;
     onChange: (value: string) => void;
     onRetry: () => void;
+    required?: boolean;
 }
 
 export function ReferenceSelect({
@@ -28,6 +29,7 @@ export function ReferenceSelect({
     error,
     onChange,
     onRetry,
+    required = false,
 }: Props) {
     const unresolved =
         value !== "" &&
@@ -53,6 +55,7 @@ export function ReferenceSelect({
                 disabled={!allowed || pending || !!error}
                 aria-describedby={`${id}-hint`}
                 aria-busy={allowed && pending}
+                required={required}
                 onChange={(event) => onChange(event.target.value)}
             >
                 <option value="">Belum ditetapkan</option>

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { Eye, EyeOff, ArrowRight, Loader2, AlertCircle } from "lucide-react";
 import { loginSchema } from "../schemas";
 import { LoginPayload } from "../types";
@@ -46,7 +46,14 @@ export function LoginForm() {
         );
         return;
       }
-      location.assign(callbackUrl);
+
+      const session = await getSession();
+
+      location.assign(
+        session?.user.mustachePassword
+          ? "/change-password"
+          : callbackUrl,
+      );
     } catch {
       setError("Server tidak dapat dihubungi. Silakan coba lagi.");
     }

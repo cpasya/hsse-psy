@@ -1,26 +1,26 @@
 import { z } from "zod";
 export const employeeStatusSchema = z.enum(["pending", "active", "disabled"]);
 const nullableUuid = z.string().uuid().nullable().optional();
-const fields = {
+const mutableFields = {
   name: z.string().trim().min(1, "Nama wajib diisi"),
   employeeNumber: z.string().trim().nullable().optional(),
   phone: z.string().trim().nullable().optional(),
-  locationId: nullableUuid,
-  roleId: nullableUuid,
   departmentId: nullableUuid,
   jobPositionId: nullableUuid,
   status: employeeStatusSchema,
 };
 export const createEmployeeSchema = z
   .object({
-    ...fields,
-    status: employeeStatusSchema.default("pending"),
+    name: mutableFields.name,
+    employeeNumber: mutableFields.employeeNumber,
+    phone: mutableFields.phone,
+    departmentId: z.string().uuid("Department wajib dipilih"),
+    jobPositionId: z.string().uuid("Job Position ID wajib berupa UUID"),
     email: z.string().trim().email("Email tidak valid"),
-    password: z.string().min(12, "Password minimal 12 karakter").max(128),
   })
   .strict();
 export const updateEmployeeSchema = z
-  .object(fields)
+  .object(mutableFields)
   .partial()
   .strict()
   .refine((v) => Object.keys(v).length > 0, "Tidak ada perubahan yang dikirim");
@@ -42,11 +42,42 @@ export const backendEmployeeSchema = z.object({
   updatedAt: z.string().optional(),
 });
 
+export const employeePermissionSchema = z.object({
+  id: z.string().uuid(),
+  resource: z.string().trim().min(1),
+  action: z.string().trim().min(1),
+  isActive: z.boolean(),
+});
+
+export const employeeDetailSchema = backendEmployeeSchema.extend({
+  permissions: z.array(employeePermissionSchema).refine(
+    (items) => new Set(items.map((item) => item.id)).size === items.length,
+    "Detail employee berisi permission duplikat",
+  ),
+});
+
 export const assignRolePermissionsSchema = z
-  .object({ permissionIds: z.array(z.string().uuid()) })
+  .object({
+    permissionIds: z.array(z.string().uuid()).refine(
+      (items) => new Set(items).size === items.length,
+      "Permission duplikat",
+    ),
+  })
   .strict();
 export type EmployeeStatus = z.infer<typeof employeeStatusSchema>;
 export type BackendEmployee = z.infer<typeof backendEmployeeSchema>;
+export type EmployeeDetail = z.infer<typeof employeeDetailSchema>;
 export type CreateEmployeePayload = z.infer<typeof createEmployeeSchema>;
 export type UpdateEmployeePayload = z.infer<typeof updateEmployeeSchema>;
 export type EmployeeFormValues = z.infer<typeof createEmployeeSchema>;
+
+export function employeePermissionFingerprint(
+  employee: EmployeeDetail,
+): string {
+  return JSON.stringify({
+    updatedAt: employee.updatedAt,
+    permissions: employee.permissions
+      .map((permission) => `${permission.id}:${permission.isActive}`)
+      .sort(),
+  });
+}

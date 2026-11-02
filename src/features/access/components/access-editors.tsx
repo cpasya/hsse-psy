@@ -69,6 +69,7 @@ export function RoleEditor(
         queryFn: getPermissionCatalogue,
         enabled: needsCatalogue && readable,
         retry: false,
+        staleTime: 5 * 60 * 1000,
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
     });
@@ -85,7 +86,13 @@ export function RoleEditor(
             (!catalogue.isSuccess || catalogue.isFetching));
 
     return (
-        <section className="card form-card access-editor">
+        <section
+            className={
+                props.mode === "new" || props.mode === "edit"
+                    ? "access-editor"
+                    : "card form-card access-editor"
+            }
+        >
             <div className="page-heading">
                 <h2>
                     {props.mode === "new"
@@ -95,12 +102,14 @@ export function RoleEditor(
                             : "Detail / edit role"}
                 </h2>
 
-                <Button
-                    variant="outline"
-                    onClick={props.onClose}
-                >
-                    Tutup
-                </Button>
+                {(props.mode === "view" || props.mode === "assign") && (
+                    <Button
+                        variant="outline"
+                        onClick={props.onClose}
+                    >
+                        Tutup
+                    </Button>
+                )}
             </div>
 
             {needsCatalogue && !readable ? (
@@ -504,7 +513,7 @@ export function PermissionEditor({
     }
 
     return (
-        <section className="card form-card access-editor">
+        <section className="access-editor">
             <h2>
                 {record ? "Edit permission" : "Tambah permission"}
             </h2>

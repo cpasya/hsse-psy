@@ -6,6 +6,9 @@ import {
   updateEmployeeSchema,
   assignRolePermissionsSchema,
 } from "../src/features/employees/schemas";
+import {
+  changePasswordSchema,
+} from "../src/features/auth/schemas";
 
 import {
   toFrontendProfile,
@@ -14,6 +17,7 @@ import {
 import {
   loginSchema,
 } from "../src/features/auth/schemas";
+import { cachedProfile } from "../src/lib/profile-cache";
 
 const me = {
   id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
@@ -40,13 +44,56 @@ const me = {
 };
 
 test(
-  "Employee create validates password, UUIDs and rejects legacy fields",
+  "Initial password change enforces strength and confirmation",
+  () => {
+    assert.equal(
+      changePasswordSchema.safeParse({
+        password: "PasswordBaru1!",
+        confirmPassword: "PasswordBaru1!",
+      }).success,
+      true,
+    );
+
+    for (const input of [
+      {
+        password: "passwordbaru1!",
+        confirmPassword: "passwordbaru1!",
+      },
+      {
+        password: "PasswordBaru!!",
+        confirmPassword: "PasswordBaru!!",
+      },
+      {
+        password: "PasswordBaru12",
+        confirmPassword: "PasswordBaru12",
+      },
+      {
+        password: "Pass1!",
+        confirmPassword: "Pass1!",
+      },
+      {
+        password: "PasswordBaru1!",
+        confirmPassword: "PasswordBeda1!",
+      },
+    ]) {
+      assert.equal(
+        changePasswordSchema.safeParse(input).success,
+        false,
+      );
+    }
+  },
+);
+
+test(
+  "Employee create matches the current backend DTO",
   () => {
     const payload = {
       name: "Example",
       email: "test@example.invalid",
-      password: "ExampleTest123!",
-      status: "pending",
+      departmentId:
+        "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      jobPositionId:
+        "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
     };
 
     assert.equal(
@@ -58,7 +105,7 @@ test(
     assert.equal(
       createEmployeeSchema.safeParse({
         ...payload,
-        password: "short",
+        departmentId: undefined,
       }).success,
       false,
     );
@@ -66,7 +113,7 @@ test(
     assert.equal(
       createEmployeeSchema.safeParse({
         ...payload,
-        roleId: "admin",
+        password: "ExampleTest123!",
       }).success,
       false,
     );
@@ -74,7 +121,7 @@ test(
     assert.equal(
       createEmployeeSchema.safeParse({
         ...payload,
-        isActive: true,
+        status: "pending",
       }).success,
       false,
     );
@@ -82,7 +129,7 @@ test(
 );
 
 test(
-  "Employee PATCH rejects email/password and empty changes",
+  "Employee PATCH rejects unsupported identity and reference fields",
   () => {
     assert.equal(
       updateEmployeeSchema.safeParse({
@@ -99,6 +146,14 @@ test(
       {
         password: "ExampleTest123!",
       },
+      {
+        roleId:
+          "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      },
+      {
+        locationId:
+          "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      },
     ]) {
       assert.equal(
         updateEmployeeSchema.safeParse(payload)
@@ -110,7 +165,7 @@ test(
 );
 
 test(
-  "/me is required as permission source; missing permissions fails",
+  "/me requires permissions but tolerates omitted non-access metadata",
   () => {
     const profile =
       toFrontendProfile(me);
@@ -154,6 +209,29 @@ test(
       }).permissions,
       [],
     );
+
+    const {
+      employeeNumber,
+      roleId,
+      departmentId,
+      jobPositionId,
+      locationId,
+      mustachePassword,
+      createdAt,
+      updatedAt,
+      ...minimal
+    } = me;
+
+    const fallback = toFrontendProfile(minimal);
+
+    assert.equal(fallback.employeeId, "");
+    assert.equal(fallback.roleId, null);
+    assert.equal(fallback.departmentId, null);
+    assert.equal(fallback.jobPositionId, null);
+    assert.equal(fallback.locationId, null);
+    assert.equal(fallback.mustachePassword, false);
+    assert.equal(fallback.createdAt, "");
+    assert.equal(fallback.updatedAt, "");
   },
 );
 
@@ -183,3 +261,25 @@ test(
     );
   },
 );
+
+test("Profile verification deduplicates briefly and supports a forced read", async () => {
+  let calls = 0;
+  const load = async () => {
+    calls += 1;
+    return toFrontendProfile(me);
+  };
+
+  const token = "test-access-token-" + Date.now();
+
+  await Promise.all([
+    cachedProfile(token, load),
+    cachedProfile(token, load),
+  ]);
+  assert.equal(calls, 1);
+
+  await cachedProfile(token, load);
+  assert.equal(calls, 1);
+
+  await cachedProfile(token, load, true);
+  assert.equal(calls, 2);
+});

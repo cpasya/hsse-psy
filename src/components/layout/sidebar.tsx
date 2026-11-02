@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useRef } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 import {
   ShieldCheck,
@@ -22,13 +23,29 @@ import { useUIStore } from "@/store/ui-store";
 
 import { signOut } from "next-auth/react";
 import { toast } from "sonner";
+import {
+  employeeListQuery,
+  initialEmployeeFilters,
+} from "@/features/users/employee-list-query";
 
 export function Sidebar({ user }: { user: UserDTO }) {
   const path = usePathname();
+  const router = useRouter();
+  const queryClient = useQueryClient();
 
   const { collapsed, mobileOpen, toggle, setMobile } = useUIStore();
 
   const asideRef = useRef<HTMLElement>(null);
+
+  function preload(href: string) {
+    router.prefetch(href);
+
+    if (href === "/users") {
+      void queryClient.prefetchQuery(
+        employeeListQuery(user, initialEmployeeFilters),
+      );
+    }
+  }
 
   useEffect(() => {
     if (!mobileOpen) return;
@@ -112,7 +129,7 @@ export function Sidebar({ user }: { user: UserDTO }) {
 
             <span className="nav-label">
               <strong>HSSE</strong>
-              <small>K3, Keamanan & Lingkungan</small>
+              <small>Dahboard bikinan pasya ganteng</small>
             </span>
           </Link>
 
@@ -149,10 +166,17 @@ export function Sidebar({ user }: { user: UserDTO }) {
                     <Link
                       key={item.href}
                       href={item.href}
+                      prefetch
                       title={item.label}
                       className={cn("nav-item", active && "active")}
                       aria-current={active ? "page" : undefined}
-                      onClick={() => setMobile(false)}
+                      onMouseEnter={() => preload(item.href)}
+                      onFocus={() => preload(item.href)}
+                      onTouchStart={() => preload(item.href)}
+                      onClick={() => {
+                        preload(item.href);
+                        setMobile(false);
+                      }}
                     >
                       <Icon size={19} />
 

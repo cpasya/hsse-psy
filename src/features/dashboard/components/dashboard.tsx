@@ -44,13 +44,12 @@ export function Dashboard({ data }: { data?: DashboardSnapshot }) {
           </p>
         </div>
         <span className="badge neutral">
-          {data ? "Data API" : "Menunggu integrasi API"}
+          {data ? "Data API" : "TEST"}
         </span>
       </div>
       {!data && (
         <div className="notice" role="status">
-          Sumber data dashboard belum dihubungkan. Angka tidak ditampilkan
-          sebagai nol karena kondisi operasional belum diketahui.
+          Sumber data dashboard belum dihubungkan.
         </div>
       )}
       <div className="metrics-grid">
@@ -79,26 +78,26 @@ export function Dashboard({ data }: { data?: DashboardSnapshot }) {
         <section className="card placeholder">
           <Activity size={28} />
           <h2>Tren laporan</h2>
-          <p>
+          {/* <p>
             Grafik akan ditampilkan setelah kontrak data tren dan API
             disepakati. Tidak ada angka atau grafik pengganti.
-          </p>
+          </p> */}
         </section>
         <section className="card placeholder">
           <ListChecks size={28} />
           <h2>Tindak lanjut prioritas</h2>
-          <p>
+          {/* <p>
             Daftar tindak lanjut menunggu sumber data operasional. Tidak ada
             entri contoh yang ditampilkan.
-          </p>
+          </p> */}
         </section>
       </div>
       <section className="card placeholder">
         <h2>Aktivitas terbaru</h2>
-        <p>
+        {/* <p>
           Riwayat aktivitas akan berasal dari layanan backend setelah
           terintegrasi.
-        </p>
+        </p> */}
       </section>
     </>
   );

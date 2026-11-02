@@ -7,6 +7,7 @@ import {
 } from "react";
 
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 
 import {
   useMutation,
@@ -26,6 +27,12 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { ReferenceSelect } from "@/components/shared/reference-select";
@@ -39,7 +46,7 @@ import type { UserDTO } from "@/features/users/types";
 import {
   createEmployee,
   disableEmployee,
-  getEmployees,
+  getEmployee,
   updateEmployee,
 } from "@/features/employees/api";
 
@@ -60,6 +67,11 @@ import {
   type ReferenceValues,
   type ReferenceAvailability,
 } from "@/features/references/selection";
+import {
+  employeeListQuery,
+  initialEmployeeFilters,
+  type EmployeeFilters,
+} from "../employee-list-query";
 
 const message = (error: unknown) =>
   error instanceof Error
@@ -99,12 +111,9 @@ export function UsersPage(
 
   const [search, setSearch] = useState("");
 
-  const [filters, setFilters] = useState({
-    page: 1,
-    limit: 20,
-    search: "",
-    status: "" as EmployeeStatus | "",
-  });
+  const [filters, setFilters] = useState<EmployeeFilters>(
+    initialEmployeeFilters,
+  );
 
   const [formOpen, setFormOpen] = useState(false);
 
@@ -142,47 +151,16 @@ export function UsersPage(
     return () => clearTimeout(timer);
   }, [search]);
 
-  const accessKey = JSON.stringify([
-    user?.id,
-    user?.roleId,
-    user?.departmentId,
-    user?.locationId,
-    user?.jobPositionId,
-    user?.updatedAt,
-    user?.permissions,
-  ]);
+  const employeeQuery = employeeListQuery(user, filters);
+  const accessKey = employeeQuery.queryKey[1];
 
   const query = useQuery({
+    ...employeeQuery,
     enabled: can(user, "employees.read"),
-
-    queryKey: [
-      "employees",
-      accessKey,
-      filters,
-    ],
-
-    queryFn: () =>
-      getEmployees({
-        ...filters,
-        status: filters.status || undefined,
-      }),
   });
 
   // Hook selalu dipanggil.
   // Request hanya aktif ketika form dan izin sesuai.
-  const roles = useQuery({
-    queryKey: [
-      "references",
-      accessKey,
-      "roles",
-    ],
-    enabled:
-      formOpen &&
-      canSaveForm &&
-      can(user, "roles.read"),
-    queryFn: () => getReferenceOptions("roles"),
-  });
-
   const departments = useQuery({
     queryKey: [
       "references",
@@ -197,46 +175,31 @@ export function UsersPage(
       getReferenceOptions("departments"),
   });
 
-  const locations = useQuery({
-    queryKey: [
-      "references",
-      accessKey,
-      "locations",
-    ],
-    enabled:
-      formOpen &&
-      canSaveForm &&
-      can(user, "locations.read"),
-    queryFn: () =>
-      getReferenceOptions("locations"),
-  });
+  const canReadDepartments = can(
+    user,
+    "departments.read",
+  );
 
-  const referenceQueries = {
-    roleId: roles,
-    departmentId: departments,
-    locationId: locations,
+  const unavailableReference = {
+    allowed: false,
+    ready: false,
+    items: [],
   };
 
-  const availability = Object.fromEntries(
-    REFERENCE_FIELDS.map((field) => {
-      const current = referenceQueries[field.key];
-      const allowed = can(user, field.permission);
-
-      return [
-        field.key,
-        {
-          allowed,
-          ready:
-            allowed &&
-            current.isSuccess &&
-            !current.isFetching,
-          items: allowed
-            ? current.data ?? []
-            : [],
-        },
-      ];
-    }),
-  ) as Record<
+  const availability = {
+    roleId: unavailableReference,
+    departmentId: {
+      allowed: canReadDepartments,
+      ready:
+        canReadDepartments &&
+        departments.isSuccess &&
+        !departments.isFetching,
+      items: canReadDepartments
+        ? departments.data ?? []
+        : [],
+    },
+    locationId: unavailableReference,
+  } satisfies Record<
     keyof ReferenceValues,
     ReferenceAvailability
   >;
@@ -280,7 +243,6 @@ export function UsersPage(
 
     onSuccess: async (_data, variables) => {
       setFormOpen(false);
-      setEditing(null);
       setFormError("");
 
       if (!variables.id) {
@@ -330,9 +292,15 @@ export function UsersPage(
 
   function closeForm() {
     setFormOpen(false);
-    setEditing(null);
-    setSelected(referencesOf(null));
-    setFormError("");
+  }
+
+  function prefetchEmployee(employeeId: string) {
+    if (!user) return;
+
+    void client.prefetchQuery({
+      queryKey: ["employee-detail", user.id, employeeId],
+      queryFn: () => getEmployee(employeeId),
+    });
   }
 
   function submit(
@@ -357,7 +325,9 @@ export function UsersPage(
         event.currentTarget,
       );
 
-      const status = text(form, "status");
+      const status = editing
+        ? text(form, "status")
+        : "";
 
       if (
         editing?.id === user?.id &&
@@ -412,21 +382,18 @@ export function UsersPage(
 
       const base = {
         name: text(form, "name"),
-        status,
         ...fieldsToSend,
       };
 
       const payload = editing
-        ? base
+        ? {
+          ...base,
+          status,
+        }
         : {
           ...base,
 
           email: text(form, "email"),
-
-          // Password tidak boleh di-trim.
-          password: String(
-            form.get("password") ?? "",
-          ),
         };
 
       const parsed = editing
@@ -488,9 +455,6 @@ export function UsersPage(
 
           <h1>Master User</h1>
 
-          <p className="muted">
-            Data karyawan dari backend HSSE.
-          </p>
         </div>
 
         {can(user, "employees.create") && (
@@ -511,8 +475,7 @@ export function UsersPage(
         />
 
         <span>
-          Akses halaman dan aksi mengikuti
-          effective permissions dari backend /me.
+          Akses Halaman Dilindungi.
         </span>
       </div>
 
@@ -562,7 +525,7 @@ export function UsersPage(
             </div>
           </div>
 
-          <div className="field">
+          <div className="field employee-filter-select">
             <label htmlFor="employee-status">
               Status
             </label>
@@ -596,7 +559,7 @@ export function UsersPage(
             </select>
           </div>
 
-          <div className="field">
+          <div className="field employee-filter-select">
             <label htmlFor="employee-limit">
               Per halaman
             </label>
@@ -680,7 +643,7 @@ export function UsersPage(
                         "Email",
                         "Nomor karyawan",
                         "Status",
-                        "Role ID",
+                        // "Role ID",
                         "Aksi",
                       ].map((label) => (
                         <th
@@ -731,15 +694,29 @@ export function UsersPage(
                             />
                           </td>
 
-                          <td>
+                          {/* <td>
                             <code className="employee-role">
                               {employee.roleId ??
                                 "—"}
                             </code>
-                          </td>
+                          </td> */}
 
                           <td>
                             <div className="row-actions">
+                              <Button asChild variant="outline">
+                                <Link
+                                  href={`/users/${employee.id}`}
+                                  onMouseEnter={() =>
+                                    prefetchEmployee(employee.id)
+                                  }
+                                  onFocus={() =>
+                                    prefetchEmployee(employee.id)
+                                  }
+                                >
+                                  Detail &amp; akses
+                                </Link>
+                              </Button>
+
                               {can(
                                 user,
                                 "employees.update",
@@ -755,7 +732,7 @@ export function UsersPage(
                                       )
                                     }
                                   >
-                                    Edit
+                                    Edit profil
                                   </Button>
                                 )}
 
@@ -883,20 +860,27 @@ export function UsersPage(
         }}
       />
 
-      {formOpen && canSaveForm && (
-        <section className="card form-card">
-          <h2>
-            {editing
-              ? "Edit karyawan"
-              : "Tambah karyawan"}
-          </h2>
+      <Dialog
+        open={formOpen && canSaveForm}
+        onOpenChange={(open) => {
+          if (!open && !save.isPending) closeForm();
+        }}
+      >
+        <DialogContent className="employee-form-modal">
+          <DialogTitle asChild>
+            <h2>
+              {editing
+                ? "Edit karyawan"
+                : "Tambah karyawan"}
+            </h2>
+          </DialogTitle>
 
-          <p className="muted">
-            Role, Department, dan Location
-            memakai data backend. Referensi
-            yang tidak diubah saat edit tidak
-            dikirim ulang.
-          </p>
+          <DialogDescription>
+            Department memakai data backend.
+            Job Position masih menggunakan UUID
+            sesuai kontrak saat ini. Password awal
+            dibuat oleh backend.
+          </DialogDescription>
 
           <form
             key={editing?.id ?? "new"}
@@ -983,70 +967,43 @@ export function UsersPage(
                   />
                 </div>
 
-                <div className="field">
-                  <label htmlFor="employee-form-status">
-                    Status
-                  </label>
-
-                  <select
-                    id="employee-form-status"
-                    name="status"
-                    defaultValue={
-                      editing?.status ??
-                      "pending"
-                    }
-                  >
-                    {[
-                      "pending",
-                      "active",
-                      "disabled",
-                    ].map((item) => (
-                      <option
-                        key={item}
-                        value={item}
-                        disabled={
-                          editing?.id ===
-                          user?.id &&
-                          item === "disabled"
-                        }
-                      >
-                        {item}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {!editing && (
+                {editing && (
                   <div className="field">
-                    <label htmlFor="employee-password">
-                      Password awal
+                    <label htmlFor="employee-form-status">
+                      Status
                     </label>
 
-                    <input
-                      id="employee-password"
-                      name="password"
-                      type="password"
-                      required
-                      minLength={12}
-                      maxLength={128}
-                      autoComplete="new-password"
-                    />
-
-                    <small>
-                      Minimal 12 karakter.
-                      Kebijakan tambahan
-                      diperiksa backend.
-                    </small>
+                    <select
+                      id="employee-form-status"
+                      name="status"
+                      defaultValue={editing.status}
+                    >
+                      {[
+                        "pending",
+                        "active",
+                        "disabled",
+                      ].map((item) => (
+                        <option
+                          key={item}
+                          value={item}
+                          disabled={
+                            editing.id ===
+                            user?.id &&
+                            item === "disabled"
+                          }
+                        >
+                          {item}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 )}
 
-                {REFERENCE_FIELDS.map(
+                {REFERENCE_FIELDS.filter(
+                  (field) =>
+                    field.key === "departmentId",
+                ).map(
                   (field) => {
-                    const current =
-                      referenceQueries[
-                      field.key
-                      ];
-
                     const state =
                       availability[field.key];
 
@@ -1063,16 +1020,17 @@ export function UsersPage(
                         items={state.items}
                         allowed={state.allowed}
                         pending={
-                          current.isPending ||
-                          current.isFetching
+                          departments.isPending ||
+                          departments.isFetching
                         }
                         error={
-                          current.isError
+                          departments.isError
                             ? message(
-                              current.error,
+                              departments.error,
                             )
                             : null
                         }
+                        required={!editing}
                         onChange={(value) =>
                           setSelected(
                             (previous) => ({
@@ -1083,7 +1041,7 @@ export function UsersPage(
                         }
                         onRetry={() => {
                           if (state.allowed) {
-                            void current.refetch();
+                            void departments.refetch();
                           }
                         }}
                       />
@@ -1099,7 +1057,12 @@ export function UsersPage(
                   <input
                     id="employee-jobPositionId"
                     name="jobPositionId"
-                    placeholder="UUID atau kosong"
+                    placeholder={
+                      editing
+                        ? "UUID atau kosong"
+                        : "UUID wajib diisi"
+                    }
+                    required={!editing}
                     defaultValue={
                       editing?.jobPositionId ??
                       ""
@@ -1141,8 +1104,8 @@ export function UsersPage(
               </Button>
             </div>
           </form>
-        </section>
-      )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

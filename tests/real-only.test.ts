@@ -46,6 +46,34 @@ function walk(dir: string): string[] {
 }
 
 test(
+  "Initial password change keeps the Bearer token server-only",
+  () => {
+    const api = text(
+      "src/features/auth/api.ts",
+    );
+    const route = text(
+      "src/app/api/session/change-password/route.ts",
+    );
+    const form = text(
+      "src/features/auth/components/change-password-form.tsx",
+    );
+
+    assert.ok(
+      api.includes(
+        'authRequest("/auth/change-password"',
+      ),
+    );
+    assert.ok(
+      api.includes(
+        "confirm_password: payload.confirmPassword",
+      ),
+    );
+    assert.ok(route.includes("token.accessToken"));
+    assert.equal(form.includes("accessToken"), false);
+  },
+);
+
+test(
   "No interception dependency, worker, fixture server or feature flags",
   () => {
     const pkg = JSON.parse(

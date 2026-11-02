@@ -4,7 +4,24 @@ import assert from "node:assert/strict";
 import { z } from "zod";
 
 import { parsePage } from "../src/lib/pagination";
-import { getEmployees } from "../src/features/employees/api";
+import {
+    createEmployee,
+    getEmployee,
+    getEmployees,
+    replaceEmployeePermissions,
+    updateEmployee,
+} from "../src/features/employees/api";
+import {
+    employeeDetailSchema,
+    employeePermissionFingerprint,
+} from "../src/features/employees/schemas";
+import {
+    employeeListQuery,
+    initialEmployeeFilters,
+} from "../src/features/users/employee-list-query";
+import {
+    unwrapBackendEnvelope,
+} from "../src/app/api/gateway/backend-response";
 
 import {
     collectReferencePages,
@@ -55,6 +72,225 @@ const available = (): Record<
         items: [],
     },
 });
+
+test(
+    "Employee mutations accept the backend null success body",
+    async () => {
+        const originalFetch = globalThis.fetch;
+        const requests: Array<{
+            method: string;
+            body: unknown;
+        }> = [];
+
+        globalThis.fetch = async (_input, init) => {
+            requests.push({
+                method: init?.method ?? "GET",
+                body: JSON.parse(String(init?.body)),
+            });
+
+            return new Response(
+                JSON.stringify({ data: null }),
+                {
+                    status: 200,
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                },
+            );
+        };
+
+        try {
+            await createEmployee({
+                name: "Uji",
+                email: "test@example.invalid",
+                departmentId: id,
+                jobPositionId: id2,
+            });
+            await updateEmployee(id, {
+                name: "Uji baru",
+                status: "active",
+            });
+
+            assert.deepEqual(requests, [
+                {
+                    method: "POST",
+                    body: {
+                        name: "Uji",
+                        email: "test@example.invalid",
+                        departmentId: id,
+                        jobPositionId: id2,
+                    },
+                },
+                {
+                    method: "PATCH",
+                    body: {
+                        name: "Uji baru",
+                        status: "active",
+                    },
+                },
+            ]);
+        } finally {
+            globalThis.fetch = originalFetch;
+        }
+    },
+);
+
+test(
+    "Employee detail requires a unique permission assignment",
+    () => {
+        const detail = {
+            id,
+            name: "Uji",
+            email: "test@example.invalid",
+            status: "active",
+            updatedAt: "2026-10-31",
+            permissions: [
+                {
+                    id: id2,
+                    resource: "employees",
+                    action: "read",
+                    isActive: true,
+                },
+            ],
+        };
+
+        const parsed = employeeDetailSchema.parse(detail);
+
+        assert.equal(parsed.permissions.length, 1);
+        assert.equal(
+            employeeDetailSchema.safeParse({
+                ...detail,
+                permissions: [
+                    ...detail.permissions,
+                    ...detail.permissions,
+                ],
+            }).success,
+            false,
+        );
+        assert.notEqual(
+            employeePermissionFingerprint(parsed),
+            employeePermissionFingerprint({
+                ...parsed,
+                permissions: [],
+            }),
+        );
+    },
+);
+
+test(
+    "Employee detail and permission replacement use the confirmed endpoints",
+    async () => {
+        const originalFetch = globalThis.fetch;
+        const requests: Array<{
+            url: string;
+            method: string;
+            body: string;
+        }> = [];
+
+        globalThis.fetch = async (input, init) => {
+            requests.push({
+                url: String(input),
+                method: init?.method ?? "GET",
+                body: String(init?.body ?? ""),
+            });
+
+            return new Response(
+                JSON.stringify({
+                    data: init?.method === "PUT"
+                        ? null
+                        : {
+                            id,
+                            name: "Uji",
+                            email: "test@example.invalid",
+                            status: "active",
+                            permissions: [],
+                        },
+                }),
+                {
+                    status: 200,
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                },
+            );
+        };
+
+        try {
+            const detail = await getEmployee(id);
+            await replaceEmployeePermissions(id, [id2]);
+
+            assert.equal(detail.id, id);
+            assert.equal(
+                requests[0].url,
+                `/api/gateway/employees/${id}`,
+            );
+            assert.deepEqual(requests[1], {
+                url: `/api/gateway/employees/${id}/permissions`,
+                method: "PUT",
+                body: JSON.stringify({ permissionIds: [id2] }),
+            });
+        } finally {
+            globalThis.fetch = originalFetch;
+        }
+    },
+);
+
+test(
+    "Gateway unwraps the current backend envelope once",
+    () => {
+        const page = {
+            data: [option],
+            total: 1,
+            page: 1,
+            limit: 20,
+        };
+
+        assert.equal(
+            unwrapBackendEnvelope({
+                status: 200,
+                message: "OK",
+                data: page,
+            }),
+            page,
+        );
+
+        assert.equal(unwrapBackendEnvelope(page), page);
+    },
+);
+
+test(
+    "Employee prefetch uses the same access-scoped first-page query",
+    () => {
+        const user = {
+            id,
+            name: "Uji",
+            email: "test@example.invalid",
+            employeeId: "",
+            status: "active" as const,
+            isActive: true,
+            roleId: null,
+            departmentId: null,
+            jobPositionId: null,
+            locationId: null,
+            mustachePassword: false,
+            permissions: ["employees.read"],
+            createdAt: "",
+            updatedAt: "",
+        };
+
+        const query = employeeListQuery(
+            user,
+            initialEmployeeFilters,
+        );
+
+        assert.equal(query.queryKey[0], "employees");
+        assert.match(query.queryKey[1], /employees\.read/);
+        assert.deepEqual(
+            query.queryKey[2],
+            initialEmployeeFilters,
+        );
+    },
+);
 
 test(
     "Pagination derives totalPages/next from total, not array length",

@@ -16,7 +16,7 @@ export function IntegrationPending({
           <h1>{title}</h1>
           <p className="muted">{description}</p>
         </div>
-        <span className="badge neutral">Menunggu integrasi API</span>
+        <span className="badge neutral">TEST</span>
       </div>
       <section className="card placeholder">
         <div className="placeholder-icon">

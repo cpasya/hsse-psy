@@ -8,9 +8,11 @@ import {
 import {
   assignRolePermissionsSchema,
   backendEmployeeSchema,
+  employeeDetailSchema,
   createEmployeeSchema,
   updateEmployeeSchema,
   type BackendEmployee,
+  type EmployeeDetail,
   type CreateEmployeePayload,
   type UpdateEmployeePayload,
   type EmployeeStatus,
@@ -24,20 +26,6 @@ function unwrap(input: unknown): unknown {
   )
     ? input.data
     : input;
-}
-
-function parseEmployee(input: unknown): BackendEmployee {
-  const result = backendEmployeeSchema.safeParse(
-    unwrap(input),
-  );
-
-  if (!result.success) {
-    throw new Error(
-      "Format respons employee berbeda dari kontrak",
-    );
-  }
-
-  return result.data;
 }
 
 export async function getEmployees(params: {
@@ -71,24 +59,20 @@ export async function getEmployees(params: {
 
 export async function createEmployee(
   payload: CreateEmployeePayload,
-) {
-  return parseEmployee(
-    await apiClient.post<unknown>(
-      "/employees",
-      createEmployeeSchema.parse(payload),
-    ),
+): Promise<void> {
+  await apiClient.post<unknown>(
+    "/employees",
+    createEmployeeSchema.parse(payload),
   );
 }
 
 export async function updateEmployee(
   id: string,
   payload: UpdateEmployeePayload,
-) {
-  return parseEmployee(
-    await apiClient.patch<unknown>(
-      "/employees/" + encodeURIComponent(id),
-      updateEmployeeSchema.parse(payload),
-    ),
+): Promise<void> {
+  await apiClient.patch<unknown>(
+    "/employees/" + encodeURIComponent(id),
+    updateEmployeeSchema.parse(payload),
   );
 }
 
@@ -97,6 +81,38 @@ export async function disableEmployee(
 ): Promise<void> {
   await apiClient.delete<unknown>(
     "/employees/" + encodeURIComponent(id),
+  );
+}
+
+export async function getEmployee(
+  id: string,
+): Promise<EmployeeDetail> {
+  const raw = await apiClient.get<unknown>(
+    "/employees/" + encodeURIComponent(id),
+  );
+
+  const result = employeeDetailSchema.safeParse(unwrap(raw));
+
+  if (!result.success) {
+    throw new Error(
+      "Format detail employee berbeda dari kontrak",
+    );
+  }
+
+  return result.data;
+}
+
+export async function replaceEmployeePermissions(
+  employeeId: string,
+  permissionIds: string[],
+): Promise<void> {
+  const payload = assignRolePermissionsSchema.parse({
+    permissionIds,
+  });
+
+  await apiClient.put<unknown>(
+    `/employees/${encodeURIComponent(employeeId)}/permissions`,
+    payload,
   );
 }
 

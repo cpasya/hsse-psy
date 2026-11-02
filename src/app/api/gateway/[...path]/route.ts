@@ -18,6 +18,11 @@ import {
   updatePermissionSchema,
   assignmentSchema,
 } from "@/features/access/schemas";
+import {
+  createDepartmentSchema,
+  updateDepartmentSchema,
+} from "@/features/departments/schemas";
+import { unwrapBackendEnvelope } from "../backend-response";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -32,7 +37,7 @@ function allowed(parts: string[], method: string) {
   }
 
   if (
-    ["employees", "roles", "permissions"].includes(resource)
+    ["employees", "roles", "permissions", "departments"].includes(resource)
   ) {
     if (parts.length === 1) {
       return ["GET", "POST"].includes(method);
@@ -45,7 +50,7 @@ function allowed(parts: string[], method: string) {
     }
 
     return (
-      resource === "roles" &&
+      ["roles", "employees"].includes(resource) &&
       parts.length === 3 &&
       child === "permissions" &&
       method === "PUT"
@@ -53,7 +58,7 @@ function allowed(parts: string[], method: string) {
   }
 
   return (
-    ["departments", "locations"].includes(resource) &&
+    resource === "locations" &&
     method === "GET" &&
     (
       parts.length === 1 ||
@@ -65,13 +70,18 @@ function allowed(parts: string[], method: string) {
   );
 }
 
-function fail(message: string, status: number) {
+function fail(
+  message: string,
+  status: number,
+  headers: HeadersInit = {},
+) {
   return NextResponse.json(
     { message },
     {
       status,
       headers: {
         "Cache-Control": "no-store",
+        ...headers,
       },
     },
   );
@@ -99,6 +109,8 @@ async function handler(
   req: NextRequest,
   { params }: { params: { path: string[] } },
 ) {
+  const startedAt = performance.now();
+
   if (!allowed(params.path, req.method)) {
     return fail(
       "Endpoint atau method belum didukung gateway",
@@ -116,6 +128,7 @@ async function handler(
     return fail("Origin ditolak", 403);
   }
 
+  const sessionStartedAt = performance.now();
   const raw = await getToken({
     req,
     secret: env.NEXTAUTH_SECRET,
@@ -126,6 +139,16 @@ async function handler(
   }
 
   let token = await loadEffectiveToken(raw);
+  let sessionDuration = performance.now() - sessionStartedAt;
+  let backendDuration = 0;
+
+  const timingHeaders = () => ({
+    "Server-Timing": [
+      `session;dur=${sessionDuration.toFixed(1)}`,
+      `backend;dur=${backendDuration.toFixed(1)}`,
+      `total;dur=${(performance.now() - startedAt).toFixed(1)}`,
+    ].join(", "),
+  });
 
   function sessionFailure() {
     return fail(
@@ -151,7 +174,9 @@ async function handler(
   const permission = resource === "me"
     ? null
     : params.path[2] === "permissions"
-      ? "roles.assign"
+      ? resource === "roles"
+        ? "roles.assign"
+        : "employees.update"
       : `${resource}.${req.method === "GET"
         ? "read"
         : req.method === "POST"
@@ -183,10 +208,18 @@ async function handler(
     if (
       resource === "employees" &&
       id === token.profile.id &&
-      req.method === "DELETE"
+      (
+        req.method === "DELETE" ||
+        (
+          req.method === "PUT" &&
+          params.path[2] === "permissions"
+        )
+      )
     ) {
       return fail(
-        "Tidak dapat menonaktifkan akun sendiri",
+        req.method === "DELETE"
+          ? "Tidak dapat menonaktifkan akun sendiri"
+          : "Tidak dapat mengubah hak akses akun sendiri",
         403,
       );
     }
@@ -211,7 +244,9 @@ async function handler(
 
       const input: unknown = JSON.parse(text);
 
-      const schema = resource === "employees"
+      const schema = params.path[2] === "permissions"
+        ? assignmentSchema
+        : resource === "employees"
         ? req.method === "POST"
           ? createEmployeeSchema
           : updateEmployeeSchema
@@ -221,6 +256,10 @@ async function handler(
             : req.method === "POST"
               ? createRoleSchema
               : updateRoleSchema
+          : resource === "departments"
+            ? req.method === "POST"
+              ? createDepartmentSchema
+              : updateDepartmentSchema
           : req.method === "POST"
             ? createPermissionSchema
             : updatePermissionSchema;
@@ -282,25 +321,34 @@ async function handler(
     `${env.API_BASE_URL.replace(/\/$/, "")}/${path}` +
     (query.size ? "?" + query : "");
 
-  const send = () =>
-    fetch(url, {
-      method: req.method,
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token.accessToken}`,
-      },
-      body,
-      cache: "no-store",
-      redirect: "error",
-      signal: AbortSignal.timeout(15_000),
-    });
+  const send = async () => {
+    const backendStartedAt = performance.now();
+
+    try {
+      return await fetch(url, {
+        method: req.method,
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token.accessToken}`,
+        },
+        body,
+        cache: "no-store",
+        redirect: "error",
+        signal: AbortSignal.timeout(15_000),
+      });
+    } finally {
+      backendDuration += performance.now() - backendStartedAt;
+    }
+  };
 
   try {
     let response = await send();
 
     if (response.status === 401) {
+      const refreshStartedAt = performance.now();
       token = await loadEffectiveToken(token, true);
+      sessionDuration += performance.now() - refreshStartedAt;
 
       if (token.error) return sessionFailure();
 
@@ -334,16 +382,21 @@ async function handler(
         return fail(
           "Respons backend bukan JSON yang valid",
           502,
+          timingHeaders(),
         );
       }
     }
 
     if (!response.ok) {
-      return fail(message(json), response.status);
+      return fail(
+        message(json),
+        response.status,
+        timingHeaders(),
+      );
     }
 
     return NextResponse.json(
-      { data: json },
+      { data: unwrapBackendEnvelope(json) },
       {
         status:
           response.status === 204
@@ -351,6 +404,7 @@ async function handler(
             : response.status,
         headers: {
           "Cache-Control": "no-store",
+          ...timingHeaders(),
         },
       },
     );
@@ -358,6 +412,7 @@ async function handler(
     return fail(
       "Backend tidak dapat dihubungi",
       502,
+      timingHeaders(),
     );
   }
 }

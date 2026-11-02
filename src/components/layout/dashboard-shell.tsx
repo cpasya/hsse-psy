@@ -77,7 +77,7 @@ export function DashboardShell({
         </main>
 
         <footer className="app-footer">
-          <span>HSSE · K3, Keamanan & Lingkungan</span>
+          <span>HSSE · Dahboard bikinan pasya ganteng</span>
 
           <span>Keselamatan adalah tanggung jawab bersama.</span>
         </footer>

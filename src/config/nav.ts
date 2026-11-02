@@ -9,6 +9,7 @@ import {
   HeartPulse,
   TriangleAlert,
   UserCog,
+  Building2,
   FolderCog,
 } from "lucide-react";
 
@@ -27,6 +28,7 @@ export const NAV_ICONS = {
   ftw: HeartPulse,
   incident: TriangleAlert,
   users: UserCog,
+  departments: Building2,
   files: FolderCog,
 };
 
@@ -115,6 +117,13 @@ export const DEFAULT_NAV_ITEMS: NavItem[] = [
     icon: "risk",
     group: "Administrasi",
     permission: "roles.read",
+  },
+  {
+    label: "Departments",
+    href: "/departments",
+    icon: "departments",
+    group: "Administrasi",
+    permission: "departments.read",
   },
   {
     label: "Permissions",

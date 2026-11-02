@@ -64,7 +64,7 @@ export const authOptions: NextAuthOptions = {
   ],
 
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         // Profil ini sudah diverifikasi lewat /me saat login.
         return {
@@ -87,7 +87,11 @@ export const authOptions: NextAuthOptions = {
 
       // Session read/update selalu memverifikasi ke backend.
       // Tidak memakai permission yang dikirim browser.
-      return loadEffectiveToken(token);
+      return loadEffectiveToken(
+        token,
+        false,
+        trigger === "update",
+      );
     },
 
     async session({ session, token }) {
