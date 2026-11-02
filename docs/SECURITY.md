@@ -6,7 +6,7 @@ Auth/BFF/session/permission logic berasal dari source pengguna dan dipertahankan
 Permission berasal `/me`, bukan `HSSE_FRONTEND_ROLE_MAP`. UI tidak boleh menambah grant berdasarkan nama Admin/UUID role. Missing/failed profile harus fail-closed; backend selalu menegakkan permission dan scope tiap request.
 
 ## Blocker / pekerjaan belum selesai
-- Stack tetap Next.js 14.2.35 / React18 / NextAuth4. Snapshot audit production dari versi sebelumnya melaporkan 5 advisori (3 moderate, 1 high, 1 critical). `audit-production.json` adalah **snapshot historis**, bukan audit baru redesign. Jalankan audit baru dan rencanakan versi patched dengan persetujuan; jangan menganggap desain baru menambal dependency.
+- Stack memakai Next.js 15.5.28 / React18 / NextAuth4. Audit 2 November 2026 tidak lagi melaporkan advisori Next.js, tetapi masih menemukan 1 high severity pada Zod 3; migrasi Zod 4 ditunda karena breaking change. `audit-production.json` adalah **snapshot historis**, bukan hasil audit terbaru.
 - Refresh Map/recent cache per proses, bukan distributed coordination. Persistensi token refresh/JWT cookie pada BFF, race paralel antarinstance, revocation dan lifecycle perlu review.
 - Authenticated live regression, permission revocation/status change, scope/IDOR dan backend authz belum diuji pembuat redesign.
 - `mustachePassword`, pending onboarding dan change-password endpoint/flow belum disepakati penuh.

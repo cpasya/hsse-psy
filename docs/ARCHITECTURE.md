@@ -1,7 +1,7 @@
 # Architecture — v1.3.0
 
 ## Fondasi
-Next.js 14.2.35 App Router / React 18.3.1 / TS strict / Tailwind 3 / NextAuth 4 / TanStack Query/Table / RHF/Zod / Radix / Zustand UI. Token visual dan pola layout diadaptasi dari TailAdmin Free; stack template Next16/React19/Tailwind4 tidak diimpor.
+Next.js 15.5.28 App Router / React 18.3.1 / TS strict / Tailwind 3 / NextAuth 4 / TanStack Query/Table / RHF/Zod / Radix / Zustand UI. Token visual dan pola layout diadaptasi dari TailAdmin Free; stack template Next16/React19/Tailwind4 tidak diimpor.
 
 ## Data dan session
 Login credentials diproses server. JWT session NextAuth HttpOnly memuat token untuk server; JSON session browser hanya profil dan error. Auth API membaca `/me` setelah login dan memeriksa identity/status. `loadEffectiveToken` memvalidasi profil/permissions tanpa fallback grant stale. NextAuth callback, guard dan gateway menggunakan jalur ini. Session refetch 60 detik/focus/manual bersifat eventual, bukan push.

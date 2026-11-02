@@ -107,11 +107,12 @@ function message(input: unknown) {
 
 async function handler(
   req: NextRequest,
-  { params }: { params: { path: string[] } },
+  { params }: { params: Promise<{ path: string[] }> },
 ) {
   const startedAt = performance.now();
+  const { path: pathParts } = await params;
 
-  if (!allowed(params.path, req.method)) {
+  if (!allowed(pathParts, req.method)) {
     return fail(
       "Endpoint atau method belum didukung gateway",
       404,
@@ -169,11 +170,11 @@ async function handler(
     return fail("Akun tidak aktif", 403);
   }
 
-  const [resource, id] = params.path;
+  const [resource, id] = pathParts;
 
   const permission = resource === "me"
     ? null
-    : params.path[2] === "permissions"
+    : pathParts[2] === "permissions"
       ? resource === "roles"
         ? "roles.assign"
         : "employees.update"
@@ -212,7 +213,7 @@ async function handler(
         req.method === "DELETE" ||
         (
           req.method === "PUT" &&
-          params.path[2] === "permissions"
+          pathParts[2] === "permissions"
         )
       )
     ) {
@@ -244,7 +245,7 @@ async function handler(
 
       const input: unknown = JSON.parse(text);
 
-      const schema = params.path[2] === "permissions"
+      const schema = pathParts[2] === "permissions"
         ? assignmentSchema
         : resource === "employees"
         ? req.method === "POST"
@@ -313,7 +314,7 @@ async function handler(
     query.set("status", status);
   }
 
-  const path = params.path
+  const path = pathParts
     .map(encodeURIComponent)
     .join("/");
 

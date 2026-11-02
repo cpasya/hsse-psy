@@ -44,7 +44,7 @@ export function Dashboard({ data }: { data?: DashboardSnapshot }) {
           </p>
         </div>
         <span className="badge neutral">
-          {data ? "Data API" : "TEST"}
+          {data ? "Data API" : "Menunggu integrasi API"}
         </span>
       </div>
       {!data && (

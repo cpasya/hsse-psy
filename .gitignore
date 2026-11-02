@@ -42,3 +42,5 @@ pnpm-debug.log*
 .vercel/
 
 output/
+
+.cursor

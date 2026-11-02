@@ -20,8 +20,14 @@ async function AuthorizedDetail({ employeeId }: { employeeId: string }) {
   );
 }
 
-export default function Page({ params }: { params: { id: string } }) {
-  if (!z.string().uuid().safeParse(params.id).success) {
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+
+  if (!z.string().uuid().safeParse(id).success) {
     notFound();
   }
 
@@ -39,7 +45,7 @@ export default function Page({ params }: { params: { id: string } }) {
         </section>
       )}
     >
-      <AuthorizedDetail employeeId={params.id} />
+      <AuthorizedDetail employeeId={id} />
     </Suspense>
   );
 }
