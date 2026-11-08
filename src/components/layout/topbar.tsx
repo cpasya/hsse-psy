@@ -1,9 +1,18 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { signOut, useSession } from "next-auth/react";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
-import { Menu, Bell, ChevronDown, RefreshCw } from "lucide-react";
+import {
+  Menu,
+  Bell,
+  ChevronDown,
+  RefreshCw,
+  LogOut,
+  UserRound,
+} from "lucide-react";
 
 import { useState } from "react";
 import { toast } from "sonner";
@@ -28,7 +37,6 @@ export function Topbar({ user }: { user: UserDTO }) {
 
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState(false);
-  const [profile, setProfile] = useState(false);
 
   const { collapsed, mobileOpen, toggle, setMobile } = useUIStore();
 
@@ -59,6 +67,18 @@ export function Topbar({ user }: { user: UserDTO }) {
     }
   }
 
+  async function exit() {
+    try {
+      const response = await fetch("/api/session/logout", { method: "POST" });
+
+      if (!response.ok) {
+        toast.warning("Sesi lokal ditutup; pencabutan token server gagal.");
+      }
+    } finally {
+      await signOut({ callbackUrl: "/login" });
+    }
+  }
+
   return (
     <header className="topbar">
       <div className="topbar-context">
@@ -75,7 +95,9 @@ export function Topbar({ user }: { user: UserDTO }) {
         <span>Workspace</span>
         <span className="separator">/</span>
 
-        <strong>{current?.label || "HSSE"}</strong>
+        <strong>
+          {path === "/profile" ? "Profile" : current?.label || "HSSE"}
+        </strong>
       </div>
 
       <div className="topbar-tools">
@@ -98,19 +120,54 @@ export function Topbar({ user }: { user: UserDTO }) {
           <Bell size={20} />
         </button>
 
-        <button
-          className="profile-button"
-          aria-label="Lihat profil"
-          onClick={() => setProfile(true)}
-        >
-          <span className="avatar small">{initials(user.name)}</span>
+        <DropdownMenu.Root>
+          <DropdownMenu.Trigger asChild>
+            <button className="profile-button" aria-label="Buka menu akun">
+              <span className="avatar small" aria-hidden="true">
+                {user.image ? (
+                  <img src={user.image} alt="" referrerPolicy="no-referrer" />
+                ) : (
+                  initials(user.name)
+                )}
+              </span>
 
-          <span className="header-user">
-            <strong>{user.name}</strong>
-            <small>Akun {user.status}</small>
-          </span>
-          <ChevronDown size={15} />
-        </button>
+              <span className="header-user">
+                <strong>{user.name}</strong>
+              </span>
+              <ChevronDown size={15} />
+            </button>
+          </DropdownMenu.Trigger>
+
+          <DropdownMenu.Portal>
+            <DropdownMenu.Content
+              className="profile-menu-content"
+              align="end"
+              sideOffset={10}
+            >
+              <div className="profile-menu-identity">
+                <strong>{user.name}</strong>
+                <span>{user.email}</span>
+              </div>
+
+              <DropdownMenu.Separator className="profile-menu-separator" />
+
+              <DropdownMenu.Item asChild>
+                <Link className="profile-menu-item" href="/profile">
+                  <UserRound size={18} />
+                  Account Settings
+                </Link>
+              </DropdownMenu.Item>
+
+              <DropdownMenu.Item
+                className="profile-menu-item danger"
+                onSelect={() => void exit()}
+              >
+                <LogOut size={18} />
+                Logout
+              </DropdownMenu.Item>
+            </DropdownMenu.Content>
+          </DropdownMenu.Portal>
+        </DropdownMenu.Root>
       </div>
 
       <Dialog open={notice} onOpenChange={setNotice}>
@@ -122,44 +179,6 @@ export function Topbar({ user }: { user: UserDTO }) {
           <DialogDescription>
             Layanan notifikasi belum dihubungkan.
           </DialogDescription>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={profile} onOpenChange={setProfile}>
-        <DialogContent>
-          <DialogTitle asChild>
-            <h2>{user.name}</h2>
-          </DialogTitle>
-
-          <DialogDescription>{user.email}</DialogDescription>
-
-          <dl className="detail-dl">
-            <dt>Status</dt>
-            <dd>{user.status}</dd>
-
-            <dt>Role ID</dt>
-            <dd>{user.roleId ?? "Belum ditetapkan"}</dd>
-
-            <dt>Department ID</dt>
-            <dd>{user.departmentId ?? "Belum ditetapkan"}</dd>
-
-            <dt>NIK</dt>
-            <dd>{user.employeeId || "Belum tersedia"}</dd>
-          </dl>
-
-          <h3>Effective permissions</h3>
-
-          {user.permissions.length ? (
-            <ul>
-              {user.permissions.map((permission) => (
-                <li key={permission}>
-                  <code>{permission}</code>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>Tidak ada permission operasional.</p>
-          )}
         </DialogContent>
       </Dialog>
     </header>

@@ -5,11 +5,13 @@ export interface UserDTO {
   email: string;
 
   employeeId: string;
+  image: string | null;
 
-  status: "pending" | "active" | "disabled";
+  status: "active" | "disabled";
   isActive: boolean;
 
   roleId: string | null;
+  companyId: string | null;
   departmentId: string | null;
   jobPositionId: string | null;
   locationId: string | null;

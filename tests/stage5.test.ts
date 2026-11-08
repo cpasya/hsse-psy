@@ -5,6 +5,7 @@ import { readFileSync } from "node:fs";
 import {
   createDepartment,
   deleteDepartment,
+  getDepartment,
   listDepartments,
   updateDepartment,
 } from "../src/features/departments/api";
@@ -44,7 +45,9 @@ test("Department CRUD uses the confirmed gateway endpoints", async () => {
     });
 
     const data = init?.method === "GET"
-      ? {
+      ? String(input) === `/api/gateway/departments/${id}`
+        ? { id, name: "Operations" }
+        : {
           data: [{ id, name: "Operations" }],
           total: 1,
           page: 1,
@@ -64,14 +67,21 @@ test("Department CRUD uses the confirmed gateway endpoints", async () => {
       limit: 20,
       search: "ops",
     });
+    const detail = await getDepartment(id);
     await createDepartment({ name: "Operations" });
     await updateDepartment(id, { name: "HSSE" });
     await deleteDepartment(id);
 
     assert.equal(page.data[0].name, "Operations");
+    assert.equal(detail.name, "Operations");
     assert.deepEqual(requests, [
       {
         url: "/api/gateway/departments?page=1&limit=20&search=ops",
+        method: "GET",
+        body: "",
+      },
+      {
+        url: `/api/gateway/departments/${id}`,
         method: "GET",
         body: "",
       },

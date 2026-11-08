@@ -27,6 +27,7 @@ export function employeeListQuery(
   const accessKey = JSON.stringify([
     user?.id,
     user?.roleId,
+    user?.companyId,
     user?.departmentId,
     user?.locationId,
     user?.jobPositionId,

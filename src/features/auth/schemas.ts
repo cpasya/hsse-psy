@@ -60,14 +60,12 @@ export const meResponseSchema = z.object({
   email: z.string().email(),
 
   employeeNumber: z.string().nullable().optional(),
+  image: z.string().url().nullable().optional(),
 
-  status: z.enum([
-    "pending",
-    "active",
-    "disabled",
-  ]),
+  status: z.enum(["active", "disabled"]),
 
   roleId: z.string().uuid().nullable().optional(),
+  companyId: z.string().uuid().nullable().optional(),
   departmentId: z.string().uuid().nullable().optional(),
   jobPositionId: z.string().uuid().nullable().optional(),
   locationId: z.string().uuid().nullable().optional(),

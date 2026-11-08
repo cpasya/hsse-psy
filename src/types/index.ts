@@ -9,6 +9,16 @@ export const knownPermissions = [
   "departments.update",
   "departments.delete",
 
+  "companies.read",
+  "companies.create",
+  "companies.update",
+  "companies.delete",
+
+  "job-positions.read",
+  "job-positions.create",
+  "job-positions.update",
+  "job-positions.delete",
+
   "locations.read",
   "locations.create",
   "locations.update",

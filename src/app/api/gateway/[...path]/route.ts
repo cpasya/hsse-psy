@@ -7,6 +7,7 @@ import { loadEffectiveToken } from "@/lib/session-access";
 import { can } from "@/lib/rbac";
 
 import {
+  MAX_EMPLOYEE_IMAGE_BYTES,
   createEmployeeSchema,
   updateEmployeeSchema,
 } from "@/features/employees/schemas";
@@ -22,6 +23,14 @@ import {
   createDepartmentSchema,
   updateDepartmentSchema,
 } from "@/features/departments/schemas";
+import {
+  createCompanySchema,
+  updateCompanySchema,
+} from "@/features/companies/schemas";
+import {
+  createJobPositionSchema,
+  updateJobPositionSchema,
+} from "@/features/job-positions/schemas";
 import { unwrapBackendEnvelope } from "../backend-response";
 
 export const dynamic = "force-dynamic";
@@ -37,7 +46,14 @@ function allowed(parts: string[], method: string) {
   }
 
   if (
-    ["employees", "roles", "permissions", "departments"].includes(resource)
+    [
+      "employees",
+      "roles",
+      "permissions",
+      "departments",
+      "companies",
+      "job-positions",
+    ].includes(resource)
   ) {
     if (parts.length === 1) {
       return ["GET", "POST"].includes(method);
@@ -231,20 +247,23 @@ async function handler(
   const denial = denied();
   if (denial) return denial;
 
-  let body: string | undefined;
+  let body: string | FormData | undefined;
+  let requestedEmployeeStatus: string | undefined;
 
   if (["POST", "PATCH", "PUT"].includes(req.method)) {
+    const employeeMultipart =
+      resource === "employees" &&
+      ["POST", "PATCH"].includes(req.method) &&
+      pathParts.length <= 2;
+
+    if (
+      employeeMultipart &&
+      !req.headers.get("content-type")?.startsWith("multipart/form-data")
+    ) {
+      return fail("Employee harus dikirim sebagai multipart/form-data", 415);
+    }
+
     try {
-      const text = await req.text();
-
-      if (
-        new TextEncoder().encode(text).length > 65_536
-      ) {
-        return fail("Payload terlalu besar", 413);
-      }
-
-      const input: unknown = JSON.parse(text);
-
       const schema = pathParts[2] === "permissions"
         ? assignmentSchema
         : resource === "employees"
@@ -261,9 +280,68 @@ async function handler(
             ? req.method === "POST"
               ? createDepartmentSchema
               : updateDepartmentSchema
+          : resource === "companies"
+            ? req.method === "POST"
+              ? createCompanySchema
+              : updateCompanySchema
+          : resource === "job-positions"
+            ? req.method === "POST"
+              ? createJobPositionSchema
+              : updateJobPositionSchema
           : req.method === "POST"
             ? createPermissionSchema
             : updatePermissionSchema;
+
+      let input: unknown;
+      let form: FormData | undefined;
+
+      if (employeeMultipart) {
+        const contentLength = Number(req.headers.get("content-length"));
+
+        if (
+          Number.isFinite(contentLength) &&
+          contentLength > MAX_EMPLOYEE_IMAGE_BYTES + 65_536
+        ) {
+          return fail("Payload employee terlalu besar", 413);
+        }
+
+        form = await req.formData();
+
+        const keys = [...new Set(form.keys())];
+
+        if (keys.some((key) => form!.getAll(key).length !== 1)) {
+          return fail("Field employee tidak boleh dikirim berulang", 422);
+        }
+
+        const encoder = new TextEncoder();
+        const totalSize = [...form.values()].reduce(
+          (size, value) =>
+            size +
+            (typeof value === "string"
+              ? encoder.encode(value).length
+              : value.size),
+          0,
+        );
+
+        if (totalSize > MAX_EMPLOYEE_IMAGE_BYTES + 65_536) {
+          return fail("Payload employee terlalu besar", 413);
+        }
+
+        input = Object.fromEntries(
+          [...form.entries()].map(([key, value]) => [
+            key,
+            value === "null" ? null : value,
+          ]),
+        );
+      } else {
+        const text = await req.text();
+
+        if (new TextEncoder().encode(text).length > 65_536) {
+          return fail("Payload terlalu besar", 413);
+        }
+
+        input = JSON.parse(text);
+      }
 
       const parsed = schema.parse(input);
 
@@ -279,14 +357,43 @@ async function handler(
         );
       }
 
-      body = JSON.stringify(parsed);
+      if (
+        resource === "employees" &&
+        "status" in parsed &&
+        typeof parsed.status === "string"
+      ) {
+        requestedEmployeeStatus = parsed.status;
+      }
+
+      if (form) {
+        const validated = new FormData();
+
+        for (const [key, value] of Object.entries(parsed)) {
+          if (value === undefined) continue;
+
+          validated.append(
+            key,
+            value instanceof File
+              ? value
+              : value === null
+                ? "null"
+                : String(value),
+          );
+        }
+
+        body = validated;
+      } else {
+        body = JSON.stringify(parsed);
+      }
     } catch (error) {
       return fail(
         error instanceof z.ZodError
           ? error.issues
             .map((issue) => issue.message)
             .join(", ")
-          : "Payload JSON tidak valid",
+          : employeeMultipart
+            ? "Payload multipart tidak valid"
+            : "Payload JSON tidak valid",
         422,
       );
     }
@@ -306,7 +413,7 @@ async function handler(
 
   if (resource === "employees" && status !== null) {
     if (
-      !["pending", "active", "disabled"].includes(status)
+      !["active", "disabled"].includes(status)
     ) {
       return fail("Filter status tidak valid", 422);
     }
@@ -324,15 +431,19 @@ async function handler(
 
   const send = async () => {
     const backendStartedAt = performance.now();
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+      Authorization: `Bearer ${token.accessToken}`,
+    };
+
+    if (!(body instanceof FormData)) {
+      headers["Content-Type"] = "application/json";
+    }
 
     try {
       return await fetch(url, {
         method: req.method,
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token.accessToken}`,
-        },
+        headers,
         body,
         cache: "no-store",
         redirect: "error",
@@ -361,8 +472,7 @@ async function handler(
       if (
         resource === "employees" &&
         id === token.profile.id &&
-        body &&
-        JSON.parse(body).status === "disabled"
+        requestedEmployeeStatus === "disabled"
       ) {
         return fail(
           "Tidak dapat menonaktifkan akun sendiri",

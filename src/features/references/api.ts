@@ -11,6 +11,7 @@ import type { ReferenceOption } from "./selection";
 export type ReferenceResource =
     | "roles"
     | "departments"
+    | "job-positions"
     | "locations";
 
 // Picker hanya memerlukan id dan name.

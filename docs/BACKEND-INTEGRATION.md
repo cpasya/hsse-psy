@@ -20,7 +20,7 @@ Browser tidak memperoleh access/refresh token lewat session JSON. Gateway same-o
 - Employees list parser menerima array atau satu envelope `data` setelah HTTP wrapper; butuh respons aktual jika server mengubah format.
 - Metadata pagination belum dipakai; next menggunakan panjang hasil page size 20.
 - Helper roles/permissions halaman pertama limit 100 bukan katalog lengkap.
-- UUID referensi manual, `jobPositionId` tidak membuktikan endpoint job position master.
+- Department dan Job Position memakai katalog backend terpaginasikan; picker mempertahankan UUID existing bila katalog gagal atau tidak dapat dibaca.
 - Pending/disabled/forced-password-change belum memiliki flow khusus lengkap.
 
 ## Tahap 2

@@ -29,3 +29,11 @@ export function StatusBadge({ status }: { status: string }) {
     </span>
   );
 }
+
+export function StatusBadgeTopBar({ status }: { status: string }) {
+  return (
+    <span className={cn("badge", tone[status] || "neutral")}>
+      <span className="badge-dot" />
+    </span>
+  );
+}

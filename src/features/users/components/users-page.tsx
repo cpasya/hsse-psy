@@ -89,6 +89,7 @@ const referencesOf = (
 ): ReferenceValues => ({
   roleId: employee?.roleId ?? "",
   departmentId: employee?.departmentId ?? "",
+  jobPositionId: employee?.jobPositionId ?? "",
   locationId: employee?.locationId ?? "",
 });
 
@@ -98,6 +99,7 @@ export function UsersPage(
   const {
     data: session,
     status: sessionStatus,
+    update: updateSession,
   } = useSession();
 
   // Sumber izin adalah session terbaru, bukan prop server lama.
@@ -127,6 +129,7 @@ export function UsersPage(
     useState<BackendEmployee | null>(null);
 
   const [formError, setFormError] = useState("");
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const canSaveForm = can(
     user,
@@ -150,6 +153,12 @@ export function UsersPage(
 
     return () => clearTimeout(timer);
   }, [search]);
+
+  useEffect(() => () => {
+    if (imagePreview?.startsWith("blob:")) {
+      URL.revokeObjectURL(imagePreview);
+    }
+  }, [imagePreview]);
 
   const employeeQuery = employeeListQuery(user, filters);
   const accessKey = employeeQuery.queryKey[1];
@@ -180,6 +189,25 @@ export function UsersPage(
     "departments.read",
   );
 
+  const jobPositions = useQuery({
+    queryKey: [
+      "references",
+      accessKey,
+      "job-positions",
+    ],
+    enabled:
+      formOpen &&
+      canSaveForm &&
+      can(user, "job-positions.read"),
+    queryFn: () =>
+      getReferenceOptions("job-positions"),
+  });
+
+  const canReadJobPositions = can(
+    user,
+    "job-positions.read",
+  );
+
   const unavailableReference = {
     allowed: false,
     ready: false,
@@ -196,6 +224,16 @@ export function UsersPage(
         !departments.isFetching,
       items: canReadDepartments
         ? departments.data ?? []
+        : [],
+    },
+    jobPositionId: {
+      allowed: canReadJobPositions,
+      ready:
+        canReadJobPositions &&
+        jobPositions.isSuccess &&
+        !jobPositions.isFetching,
+      items: canReadJobPositions
+        ? jobPositions.data ?? []
         : [],
     },
     locationId: unavailableReference,
@@ -257,6 +295,10 @@ export function UsersPage(
       await client.invalidateQueries({
         queryKey: ["employees"],
       });
+
+      if (variables.id === user?.id) {
+        await updateSession().catch(() => undefined);
+      }
     },
 
     onError: (error) => {
@@ -286,6 +328,7 @@ export function UsersPage(
   ) {
     setEditing(employee);
     setSelected(referencesOf(employee));
+    setImagePreview(employee?.image ?? null);
     setFormError("");
     setFormOpen(true);
   }
@@ -344,6 +387,7 @@ export function UsersPage(
         !!editing,
         availability,
       );
+      const image = form.get("image");
 
       const optionalFields = {
         employeeNumber: nullable(
@@ -353,10 +397,9 @@ export function UsersPage(
 
         phone: nullable(form, "phone"),
 
-        jobPositionId: nullable(
-          form,
-          "jobPositionId",
-        ),
+        ...(image instanceof File && image.size > 0
+          ? { image }
+          : {}),
 
         ...referenceChanges,
       };
@@ -388,7 +431,9 @@ export function UsersPage(
       const payload = editing
         ? {
           ...base,
-          status,
+          ...(status !== editing.status
+            ? { status }
+            : {}),
         }
         : {
           ...base,
@@ -548,7 +593,6 @@ export function UsersPage(
               </option>
 
               {[
-                "pending",
                 "active",
                 "disabled",
               ].map((item) => (
@@ -666,8 +710,14 @@ export function UsersPage(
                                 className="avatar"
                                 aria-hidden="true"
                               >
-                                {initials(
-                                  employee.name,
+                                {employee.image ? (
+                                  <img
+                                    src={employee.image}
+                                    alt=""
+                                    referrerPolicy="no-referrer"
+                                  />
+                                ) : (
+                                  initials(employee.name)
                                 )}
                               </span>
 
@@ -866,7 +916,17 @@ export function UsersPage(
           if (!open && !save.isPending) closeForm();
         }}
       >
-        <DialogContent className="employee-form-modal">
+        <DialogContent
+          className="employee-form-modal"
+          onAnimationEnd={(event) => {
+            if (
+              event.target === event.currentTarget &&
+              event.currentTarget.dataset.state === "closed"
+            ) {
+              setImagePreview(null);
+            }
+          }}
+        >
           <DialogTitle asChild>
             <h2>
               {editing
@@ -895,6 +955,50 @@ export function UsersPage(
                 margin: 0,
               }}
             >
+              <div className="field employee-image-field">
+                <span
+                  className="avatar employee-image-preview"
+                  aria-hidden="true"
+                >
+                  {imagePreview ? (
+                    <img
+                      src={imagePreview}
+                      alt=""
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    initials(editing?.name ?? "Karyawan")
+                  )}
+                </span>
+
+                <label htmlFor="employee-image">
+                  Foto profil
+                </label>
+
+                <input
+                  id="employee-image"
+                  name="image"
+                  type="file"
+                  accept="image/jpeg,image/png"
+                  onChange={(event) => {
+                    const file = event.currentTarget.files?.[0];
+
+                    setImagePreview(
+                      file && file.size > 0
+                        ? URL.createObjectURL(file)
+                        : editing?.image ?? null,
+                    );
+                  }}
+                />
+
+                <small>
+                  JPEG atau PNG, maksimal 2 MB.
+                  {editing?.image
+                    ? " Kosongkan untuk mempertahankan foto saat ini."
+                    : ""}
+                </small>
+              </div>
+
               <div className="form-grid">
                 <div className="field">
                   <label htmlFor="employee-name">
@@ -967,45 +1071,18 @@ export function UsersPage(
                   />
                 </div>
 
-                {editing && (
-                  <div className="field">
-                    <label htmlFor="employee-form-status">
-                      Status
-                    </label>
-
-                    <select
-                      id="employee-form-status"
-                      name="status"
-                      defaultValue={editing.status}
-                    >
-                      {[
-                        "pending",
-                        "active",
-                        "disabled",
-                      ].map((item) => (
-                        <option
-                          key={item}
-                          value={item}
-                          disabled={
-                            editing.id ===
-                            user?.id &&
-                            item === "disabled"
-                          }
-                        >
-                          {item}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-
                 {REFERENCE_FIELDS.filter(
                   (field) =>
-                    field.key === "departmentId",
+                    field.key === "departmentId" ||
+                    field.key === "jobPositionId",
                 ).map(
                   (field) => {
                     const state =
                       availability[field.key];
+                    const referenceQuery =
+                      field.key === "departmentId"
+                        ? departments
+                        : jobPositions;
 
                     return (
                       <ReferenceSelect
@@ -1020,13 +1097,13 @@ export function UsersPage(
                         items={state.items}
                         allowed={state.allowed}
                         pending={
-                          departments.isPending ||
-                          departments.isFetching
+                          referenceQuery.isPending ||
+                          referenceQuery.isFetching
                         }
                         error={
-                          departments.isError
+                          referenceQuery.isError
                             ? message(
-                              departments.error,
+                              referenceQuery.error,
                             )
                             : null
                         }
@@ -1041,7 +1118,7 @@ export function UsersPage(
                         }
                         onRetry={() => {
                           if (state.allowed) {
-                            void departments.refetch();
+                            void referenceQuery.refetch();
                           }
                         }}
                       />
@@ -1049,30 +1126,33 @@ export function UsersPage(
                   },
                 )}
 
-                <div className="field">
-                  <label htmlFor="employee-jobPositionId">
-                    Job Position ID
-                  </label>
+                {editing && (
+                  <div className="field">
+                    <label htmlFor="employee-form-status">
+                      Status
+                    </label>
 
-                  <input
-                    id="employee-jobPositionId"
-                    name="jobPositionId"
-                    placeholder={
-                      editing
-                        ? "UUID atau kosong"
-                        : "UUID wajib diisi"
-                    }
-                    required={!editing}
-                    defaultValue={
-                      editing?.jobPositionId ??
-                      ""
-                    }
-                  />
+                    <select
+                      id="employee-form-status"
+                      name="status"
+                      defaultValue={editing.status}
+                    >
+                      {["active", "disabled"].map((item) => (
+                        <option
+                          key={item}
+                          value={item}
+                          disabled={
+                            editing.id === user?.id &&
+                            item === "disabled"
+                          }
+                        >
+                          {item}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
-                  <small>
-                    Masih UUID manual, otw select-option.
-                  </small>
-                </div>
               </div>
             </fieldset>
 

@@ -1,5 +1,10 @@
 import { z } from "zod";
-export const employeeStatusSchema = z.enum(["pending", "active", "disabled"]);
+export const employeeStatusSchema = z.enum(["active", "disabled"]);
+export const MAX_EMPLOYEE_IMAGE_BYTES = 2 * 1024 * 1024;
+export const employeeImageSchema = z
+  .file()
+  .max(MAX_EMPLOYEE_IMAGE_BYTES, "Ukuran foto maksimal 2 MB")
+  .mime(["image/jpeg", "image/png"], "Foto harus berupa JPEG atau PNG");
 const nullableUuid = z.string().uuid().nullable().optional();
 const mutableFields = {
   name: z.string().trim().min(1, "Nama wajib diisi"),
@@ -8,6 +13,7 @@ const mutableFields = {
   departmentId: nullableUuid,
   jobPositionId: nullableUuid,
   status: employeeStatusSchema,
+  image: employeeImageSchema.optional(),
 };
 export const createEmployeeSchema = z
   .object({
@@ -17,6 +23,7 @@ export const createEmployeeSchema = z
     departmentId: z.string().uuid("Department wajib dipilih"),
     jobPositionId: z.string().uuid("Job Position ID wajib berupa UUID"),
     email: z.string().trim().email("Email tidak valid"),
+    image: mutableFields.image,
   })
   .strict();
 export const updateEmployeeSchema = z
@@ -37,7 +44,7 @@ export const backendEmployeeSchema = z.object({
   locationId: z.string().nullable().optional(),
   emailVerified: z.boolean().optional(),
   mustachePassword: z.boolean().optional(),
-  image: z.string().nullable().optional(),
+  image: z.string().url().nullable().optional(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
 });

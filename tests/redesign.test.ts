@@ -8,7 +8,6 @@ import { StatusBadge } from "../src/components/shared/status-badge";
 test("Employee backend statuses have explicit semantic badges", () => {
   for (const [status, tone] of [
     ["active", "success"],
-    ["pending", "warning"],
     ["disabled", "neutral"],
   ]) {
     const html = renderToStaticMarkup(createElement(StatusBadge, { status }));
@@ -32,6 +31,12 @@ test("TailAdmin adaptation retains notices, responsive and keyboard foundations"
   const sidebar = readFileSync("src/components/layout/sidebar.tsx", "utf8");
   assert.ok(sidebar.includes('event.key === "Escape"'));
   assert.ok(sidebar.includes("body.inert = true"));
+  assert.ok(sidebar.includes("user.image"));
+  assert.ok(
+    readFileSync("src/components/layout/topbar.tsx", "utf8").includes(
+      "user.image",
+    ),
+  );
   const themeToggle = readFileSync(
     "src/components/layout/theme-toggle.tsx",
     "utf8",
@@ -58,6 +63,10 @@ test("Dashboard modals share smooth accessible transitions", () => {
   assert.ok(css.includes("@keyframes modal-content-in"));
   assert.ok(css.includes("prefers-reduced-motion"));
   assert.ok(users.includes('className="employee-form-modal"'));
+  assert.ok(users.includes('className="avatar employee-image-preview"'));
+  assert.ok(users.includes("URL.createObjectURL(file)"));
+  assert.ok(users.includes("URL.revokeObjectURL(imagePreview)"));
+  assert.ok(users.includes('dataset.state === "closed"'));
   assert.ok(access.includes('className="access-editor-modal"'));
   assert.ok(existsSync(".cursor/rules/modal-ux.mdc"));
 });

@@ -44,3 +44,6 @@ pnpm-debug.log*
 output/
 
 .cursor
+
+# Dokumentasi internal
+docs/

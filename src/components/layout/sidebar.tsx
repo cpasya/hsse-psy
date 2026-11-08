@@ -143,7 +143,7 @@ export function Sidebar({ user }: { user: UserDTO }) {
         </div>
 
         <nav>
-          {["Utama", "Operasional HSSE", "Administrasi"].map((group) => {
+          {["Home", "Operational HSSE", "Administration"].map((group) => {
             const items = getNavItems(user).filter(
               (item) => item.group === group,
             );
@@ -189,14 +189,20 @@ export function Sidebar({ user }: { user: UserDTO }) {
           })}
         </nav>
 
-        <div className="sidebar-note nav-label">
+        {/* <div className="sidebar-note nav-label">
           <ShieldCheck size={24} />
           <strong>Keselamatan untuk semua</strong>
           <p>Kelola pekerjaan dengan akses sesuai wewenang organisasi Anda.</p>
-        </div>
+        </div> */}
         <div className="sidebar-bottom">
           <div className="profile">
-            <span className="avatar">{initials(user.name)}</span>
+            <span className="avatar" aria-hidden="true">
+              {user.image ? (
+                <img src={user.image} alt="" referrerPolicy="no-referrer" />
+              ) : (
+                initials(user.name)
+              )}
+            </span>
 
             <span className="nav-label">
               <strong>{user.name}</strong>

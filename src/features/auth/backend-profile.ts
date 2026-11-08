@@ -12,11 +12,13 @@ export function toFrontendProfile(
     email: user.email,
 
     employeeId: user.employeeNumber ?? "",
+    image: user.image ?? null,
 
     status: user.status,
     isActive: user.status === "active",
 
     roleId: user.roleId ?? null,
+    companyId: user.companyId ?? null,
     departmentId: user.departmentId ?? null,
     jobPositionId: user.jobPositionId ?? null,
     locationId: user.locationId ?? null,

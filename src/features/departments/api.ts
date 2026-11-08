@@ -24,6 +24,14 @@ export async function listDepartments(params: {
   return parsePage(raw, departmentSchema, params.page);
 }
 
+export async function getDepartment(id: string) {
+  const raw = await apiClient.get<unknown>(
+    `/departments/${encodeURIComponent(id)}`,
+  );
+
+  return departmentSchema.parse(raw);
+}
+
 export async function createDepartment(
   payload: CreateDepartmentPayload,
 ): Promise<void> {

@@ -12,6 +12,12 @@ export const REFERENCE_FIELDS = [
         permission: "departments.read",
     },
     {
+        key: "jobPositionId",
+        resource: "job-positions",
+        label: "Job Position",
+        permission: "job-positions.read",
+    },
+    {
         key: "locationId",
         resource: "locations",
         label: "Location",

@@ -326,9 +326,9 @@ function AccessContent({
             </div>
 
             <div className="notice">
-                Pengaman UI: record sistem read-only; role akun sendiri
+                Pengaman UI: record sistem read-only, role akun sendiri
                 tidak dapat diubah/dihapus di halaman ini.
-                Ini bukan pengganti validasi backend.
+                {/* Ini bukan pengganti validasi backend. */}
             </div>
 
             <section className="card access-list">

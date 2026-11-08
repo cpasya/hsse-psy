@@ -3,7 +3,10 @@ import assert from "node:assert/strict";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
+  MAX_EMPLOYEE_IMAGE_BYTES,
+  backendEmployeeSchema,
   createEmployeeSchema,
+  employeeImageSchema,
   updateEmployeeSchema,
   assignRolePermissionsSchema,
 } from "../src/features/employees/schemas";
@@ -26,9 +29,11 @@ const me = {
   email: "test@example.invalid",
 
   employeeNumber: null,
+  image: "https://cdn.example.invalid/profile.png",
   status: "active",
 
   roleId: null,
+  companyId: null,
   departmentId: null,
   jobPositionId: null,
   locationId: null,
@@ -103,6 +108,9 @@ test(
 test(
   "Employee create matches the current backend DTO",
   () => {
+    const image = new File(["image"], "avatar.png", {
+      type: "image/png",
+    });
     const payload = {
       name: "Example",
       email: "test@example.invalid",
@@ -110,6 +118,7 @@ test(
         "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
       jobPositionId:
         "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      image,
     };
 
     assert.equal(
@@ -141,6 +150,35 @@ test(
       }).success,
       false,
     );
+
+    assert.equal(
+      employeeImageSchema.safeParse(
+        new File(["image"], "avatar.txt", { type: "text/plain" }),
+      ).success,
+      false,
+    );
+
+    assert.equal(
+      employeeImageSchema.safeParse(
+        new File(
+          [new Uint8Array(MAX_EMPLOYEE_IMAGE_BYTES + 1)],
+          "avatar.png",
+          { type: "image/png" },
+        ),
+      ).success,
+      false,
+    );
+
+    assert.equal(
+      backendEmployeeSchema.safeParse({
+        id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        name: "Example",
+        email: "test@example.invalid",
+        status: "active",
+        image: "https://cdn.example.invalid/avatar.png",
+      }).success,
+      true,
+    );
   },
 );
 
@@ -150,6 +188,15 @@ test(
     assert.equal(
       updateEmployeeSchema.safeParse({
         status: "active",
+      }).success,
+      true,
+    );
+
+    assert.equal(
+      updateEmployeeSchema.safeParse({
+        image: new File(["image"], "avatar.jpg", {
+          type: "image/jpeg",
+        }),
       }).success,
       true,
     );
@@ -169,6 +216,9 @@ test(
       {
         locationId:
           "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      },
+      {
+        status: "pending",
       },
     ]) {
       assert.equal(
@@ -202,11 +252,15 @@ test(
     );
 
     assert.equal(
+      profile.image,
+      "https://cdn.example.invalid/profile.png",
+    );
+
+    assert.throws(() =>
       toFrontendProfile({
         ...me,
         status: "pending",
-      }).isActive,
-      false,
+      }),
     );
 
     const {
@@ -228,7 +282,9 @@ test(
 
     const {
       employeeNumber,
+      image,
       roleId,
+      companyId,
       departmentId,
       jobPositionId,
       locationId,
@@ -241,7 +297,9 @@ test(
     const fallback = toFrontendProfile(minimal);
 
     assert.equal(fallback.employeeId, "");
+    assert.equal(fallback.image, null);
     assert.equal(fallback.roleId, null);
+    assert.equal(fallback.companyId, null);
     assert.equal(fallback.departmentId, null);
     assert.equal(fallback.jobPositionId, null);
     assert.equal(fallback.locationId, null);

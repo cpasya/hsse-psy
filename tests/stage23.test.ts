@@ -49,6 +49,7 @@ const option = {
 const empty: ReferenceValues = {
     roleId: "",
     departmentId: "",
+    jobPositionId: "",
     locationId: "",
 };
 
@@ -66,6 +67,11 @@ const available = (): Record<
         ready: true,
         items: [],
     },
+    jobPositionId: {
+        allowed: true,
+        ready: true,
+        items: [],
+    },
     locationId: {
         allowed: true,
         ready: true,
@@ -74,18 +80,22 @@ const available = (): Record<
 });
 
 test(
-    "Employee mutations accept the backend null success body",
+    "Employee mutations use multipart and accept the backend success body",
     async () => {
         const originalFetch = globalThis.fetch;
         const requests: Array<{
             method: string;
             body: unknown;
+            contentType: string | null;
         }> = [];
 
         globalThis.fetch = async (_input, init) => {
+            assert.ok(init?.body instanceof FormData);
+
             requests.push({
                 method: init?.method ?? "GET",
-                body: JSON.parse(String(init?.body)),
+                body: Object.fromEntries(init.body.entries()),
+                contentType: new Headers(init.headers).get("content-type"),
             });
 
             return new Response(
@@ -108,6 +118,7 @@ test(
             });
             await updateEmployee(id, {
                 name: "Uji baru",
+                phone: null,
                 status: "active",
             });
 
@@ -120,13 +131,16 @@ test(
                         departmentId: id,
                         jobPositionId: id2,
                     },
+                    contentType: null,
                 },
                 {
                     method: "PATCH",
                     body: {
                         name: "Uji baru",
+                        phone: "null",
                         status: "active",
                     },
+                    contentType: null,
                 },
             ]);
         } finally {
@@ -266,9 +280,11 @@ test(
             name: "Uji",
             email: "test@example.invalid",
             employeeId: "",
+            image: null,
             status: "active" as const,
             isActive: true,
             roleId: null,
+            companyId: null,
             departmentId: null,
             jobPositionId: null,
             locationId: null,

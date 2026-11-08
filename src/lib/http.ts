@@ -15,10 +15,16 @@ async function request<T>(
   body?: unknown,
   paginated = false,
 ): Promise<T> {
+  const formData = body instanceof FormData;
   const res = await fetch("/api/gateway" + path, {
     method,
-    headers: { "Content-Type": "application/json" },
-    body: body === undefined ? undefined : JSON.stringify(body),
+    headers: formData ? undefined : { "Content-Type": "application/json" },
+    body:
+      body === undefined
+        ? undefined
+        : formData
+          ? body
+          : JSON.stringify(body),
     credentials: "same-origin",
     signal: AbortSignal.timeout(20000),
   });

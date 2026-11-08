@@ -28,6 +28,27 @@ function unwrap(input: unknown): unknown {
     : input;
 }
 
+function toFormData(
+  payload: CreateEmployeePayload | UpdateEmployeePayload,
+): FormData {
+  const form = new FormData();
+
+  for (const [key, value] of Object.entries(payload)) {
+    if (value === undefined) continue;
+
+    form.append(
+      key,
+      value instanceof File
+        ? value
+        : value === null
+          ? "null"
+          : String(value),
+    );
+  }
+
+  return form;
+}
+
 export async function getEmployees(params: {
   page?: number;
   limit?: number;
@@ -62,7 +83,7 @@ export async function createEmployee(
 ): Promise<void> {
   await apiClient.post<unknown>(
     "/employees",
-    createEmployeeSchema.parse(payload),
+    toFormData(createEmployeeSchema.parse(payload)),
   );
 }
 
@@ -72,7 +93,7 @@ export async function updateEmployee(
 ): Promise<void> {
   await apiClient.patch<unknown>(
     "/employees/" + encodeURIComponent(id),
-    updateEmployeeSchema.parse(payload),
+    toFormData(updateEmployeeSchema.parse(payload)),
   );
 }
 
