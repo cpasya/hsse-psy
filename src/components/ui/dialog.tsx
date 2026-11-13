@@ -28,7 +28,7 @@ export const DialogContent = React.forwardRef<
       {children}
       <Primitive.Close
         className="icon-btn modal-close"
-        aria-label="Tutup dialog"
+        aria-label="Close dialog"
       >
         <X size={20} />
       </Primitive.Close>

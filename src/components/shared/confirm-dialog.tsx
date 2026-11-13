@@ -28,7 +28,7 @@ export function ConfirmDialog({
           <div className="dialog-actions">
             <Alert.Cancel asChild>
               <Button variant="outline" disabled={pending}>
-                Batal
+                Cancel
               </Button>
             </Alert.Cancel>
             <Button
@@ -36,7 +36,7 @@ export function ConfirmDialog({
               disabled={pending}
               onClick={onConfirm}
             >
-              {pending ? "Memproses…" : "Ya, lanjutkan"}
+              {pending ? "Processing…" : "Yes, continue"}
             </Button>
           </div>
         </Alert.Content>

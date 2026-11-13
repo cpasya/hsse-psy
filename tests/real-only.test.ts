@@ -167,7 +167,7 @@ test(
 
     assert.ok(
       html.includes(
-        "Menunggu integrasi API",
+        "The dashboard data source has not been connected yet.",
       ),
     );
 
@@ -241,7 +241,7 @@ test(
 
     assert.ok(
       html.includes(
-        "Sumber data belum dihubungkan",
+        "Data source not connected",
       ),
     );
 

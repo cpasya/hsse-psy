@@ -41,7 +41,7 @@ export const authOptions: NextAuthOptions = {
 
         if (!input.success) {
           throw new Error(
-            "Email atau password tidak valid",
+            "Invalid email or password",
           );
         }
 

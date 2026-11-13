@@ -8,7 +8,7 @@ export default async function Page() {
   return allowed ? (
     <ModulePlaceholder
       title="HSSE Meeting"
-      description="Jadwal, kehadiran, dan notulen rapat keselamatan."
+      description="Safety meeting schedules, attendance, and minutes."
     />
   ) : (
     <Forbidden />

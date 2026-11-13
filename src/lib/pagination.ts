@@ -27,7 +27,7 @@ export function parsePage<T>(
 
     if (!result.success) {
         throw new Error(
-            "Format list tidak cocok: diperlukan { data, total, page, limit }.",
+            "Invalid list format: expected { data, total, page, limit }.",
         );
     }
 
@@ -38,7 +38,7 @@ export function parsePage<T>(
         value.data.length > value.limit ||
         value.data.length > value.total
     ) {
-        throw new Error("Metadata pagination backend tidak konsisten.");
+        throw new Error("Backend pagination metadata is inconsistent.");
     }
 
     const totalPages = Math.max(
@@ -52,7 +52,7 @@ export function parsePage<T>(
         !value.data.length
     ) {
         throw new Error(
-            "Halaman kosong tidak cocok dengan total backend. Coba lagi.",
+            "The empty page does not match the backend total. Try again.",
         );
     }
 

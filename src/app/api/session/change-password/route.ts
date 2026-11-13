@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     req.headers.get("origin") !==
     new URL(env.NEXTAUTH_URL).origin
   ) {
-    return fail("Origin ditolak", 403);
+    return fail("Origin rejected", 403);
   }
 
   const raw = await getToken({
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
   });
 
   if (!raw) {
-    return fail("Silakan login kembali", 401);
+    return fail("Please sign in again", 401);
   }
 
   let input: unknown;
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
 
     input = JSON.parse(text);
   } catch {
-    return fail("Payload JSON tidak valid", 422);
+    return fail("Invalid JSON payload", 422);
   }
 
   const parsed = changePasswordSchema.safeParse(input);
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
   const token = await loadEffectiveToken(raw);
 
   if (token.error || !token.accessToken) {
-    return fail("Sesi tidak aktif", 401);
+    return fail("Session is inactive", 401);
   }
 
   try {
@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
     return fail(
       error instanceof AuthApiError
         ? error.message
-        : "Password gagal diubah",
+        : "Failed to change password",
       error instanceof AuthApiError
         ? error.statusCode
         : 502,

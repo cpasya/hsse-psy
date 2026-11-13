@@ -40,12 +40,12 @@ export function PermissionPicker({
             disabled={disabled}
         >
             <legend>
-                Permission — {selected.length} dipilih
+                Permissions — {selected.length} selected
             </legend>
 
             <div className="field">
                 <label htmlFor="permission-search">
-                    Cari dalam katalog lengkap
+                    Search the complete catalogue
                 </label>
 
                 <input
@@ -56,8 +56,8 @@ export function PermissionPicker({
             </div>
 
             <p className="muted">
-                Pencarian tidak membuang pilihan tersembunyi.
-                Permission nonaktif tidak bisa dipilih baru.
+                Searching does not remove hidden selections.
+                Inactive permissions cannot be newly selected.
             </p>
 
             <div className="access-options">
@@ -84,9 +84,9 @@ export function PermissionPicker({
 
                             <small>
                                 {p.isActive
-                                    ? "Aktif"
-                                    : "Nonaktif — boleh dilepas"}
-                                {p.isSystem ? " · Sistem" : ""}
+                                    ? "Active"
+                                    : "Inactive — can be removed"}
+                                {p.isSystem ? " · System" : ""}
                             </small>
                         </span>
                     </label>
@@ -94,7 +94,7 @@ export function PermissionPicker({
 
                 {!visible.length && (
                     <p className="muted">
-                        Tidak ada permission yang sesuai.
+                        No matching permissions found.
                     </p>
                 )}
 
@@ -113,8 +113,8 @@ export function PermissionPicker({
                             <strong>{id}</strong>
 
                             <small>
-                                Assignment existing tidak ada di katalog.
-                                Tetap dipertahankan kecuali dilepas.
+                                Existing assignment is not in the catalogue.
+                                It remains selected unless removed.
                             </small>
                         </span>
                     </label>

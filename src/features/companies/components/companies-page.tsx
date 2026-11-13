@@ -26,7 +26,7 @@ import {
 import { createCompanySchema, type CompanyRecord } from "../schemas";
 
 const errorMessage = (error: unknown) =>
-  error instanceof Error ? error.message : "Request gagal";
+  error instanceof Error ? error.message : "Request failed";
 
 const emptyForm = {
   companyName: "",
@@ -88,7 +88,7 @@ export function CompaniesPage() {
     },
     onSuccess: async () => {
       setFormOpen(false);
-      toast.success("Company tersimpan");
+      toast.success("Company saved");
       await client.invalidateQueries({ queryKey: ["companies"] });
     },
     onError: (error) => setFormError(errorMessage(error)),
@@ -97,7 +97,7 @@ export function CompaniesPage() {
     mutationFn: deleteCompany,
     onSuccess: async () => {
       setDeleteTarget(null);
-      toast.success("Company dihapus");
+      toast.success("Company deleted");
       await client.invalidateQueries({ queryKey: ["companies"] });
     },
     onError: (error) => toast.error(errorMessage(error)),
@@ -125,7 +125,7 @@ export function CompaniesPage() {
     setFormError("");
     const permission = editing ? "companies.update" : "companies.create";
     if (!can(user, permission)) {
-      setFormError("Permission aksi tidak tersedia");
+      setFormError("Action permission is unavailable");
       return;
     }
     const parsed = createCompanySchema.safeParse({
@@ -143,7 +143,7 @@ export function CompaniesPage() {
     save.mutate({ id: editing?.id ?? null, payload: parsed.data });
   }
 
-  if (status === "loading") return <p role="status">Memverifikasi akses…</p>;
+  if (status === "loading") return <p role="status">Verifying access…</p>;
   if (!readable) return <Forbidden />;
 
   const result = query.data;
@@ -155,13 +155,13 @@ export function CompaniesPage() {
     <>
       <div className="page-heading">
         <div>
-          <p className="eyebrow">ADMINISTRASI</p>
+          <p className="eyebrow">ADMINISTRATION</p>
           <h1>Companies</h1>
-          <p className="muted">Master company dari backend HSSE.</p>
+          <p className="muted">Company master data from the HSSE backend.</p>
         </div>
         {can(user, "companies.create") && (
           <Button onClick={() => openForm(null)}>
-            <Building2 size={18} /> Tambah company
+            <Building2 size={18} /> Add company
           </Button>
         )}
       </div>
@@ -169,19 +169,19 @@ export function CompaniesPage() {
       <section className="card access-list">
         <div className="filter-bar">
           <div className="field">
-            <label htmlFor="company-search">Cari company</label>
+            <label htmlFor="company-search">Search companies</label>
             <div className="search-control">
               <Search size={18} aria-hidden="true" />
               <input
                 id="company-search"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Nama, bidang, atau alamat company"
+                placeholder="Company name, business sector, or address"
               />
             </div>
           </div>
           <div className="field">
-            <label htmlFor="company-limit">Per halaman</label>
+            <label htmlFor="company-limit">Per page</label>
             <select
               id="company-limit"
               value={filters.limit}
@@ -195,7 +195,7 @@ export function CompaniesPage() {
             >
               {[10, 20, 50, 100].map((limit) => (
                 <option key={limit} value={limit}>
-                  {limit} company
+                  {limit} companies
                 </option>
               ))}
             </select>
@@ -204,13 +204,13 @@ export function CompaniesPage() {
 
         {query.isPending ? (
           <p className="table-state" role="status">
-            Memuat company…
+            Loading companies…
           </p>
         ) : query.isError ? (
           <div className="notice error" role="alert">
             <span>{errorMessage(query.error)}</span>
             <Button variant="outline" onClick={() => void query.refetch()}>
-              Coba lagi
+              Try again
             </Button>
           </div>
         ) : result ? (
@@ -219,17 +219,17 @@ export function CompaniesPage() {
               className="table-scroll"
               tabIndex={0}
               role="region"
-              aria-label="Tabel company"
+              aria-label="Companies table"
             >
               <table className="access-table">
                 <thead>
                   <tr>
                     <th>Company</th>
-                    <th>Bidang usaha</th>
-                    <th>Alamat</th>
-                    <th>Deskripsi</th>
+                    <th>Business sector</th>
+                    <th>Address</th>
+                    <th>Description</th>
                     <th>ID</th>
-                    <th>Aksi</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -259,7 +259,7 @@ export function CompaniesPage() {
                               variant="destructive"
                               onClick={() => setDeleteTarget(record)}
                             >
-                              Hapus
+                              Delete
                             </Button>
                           )}
                         </div>
@@ -270,12 +270,12 @@ export function CompaniesPage() {
               </table>
             </div>
             {!result.data.length && (
-              <p className="table-state">Tidak ada company yang sesuai.</p>
+              <p className="table-state">No matching companies found.</p>
             )}
             <div className="pagination">
               <span>
                 {result.total === 0 ? 0 : (result.page - 1) * result.limit + 1}–
-                {Math.min(result.page * result.limit, result.total)} dari{" "}
+                {Math.min(result.page * result.limit, result.total)} of{" "}
                 {result.total}
               </span>
               <div className="pagination-controls">
@@ -289,7 +289,7 @@ export function CompaniesPage() {
                     }))
                   }
                 >
-                  Sebelumnya
+                  Previous
                 </Button>
                 <Button
                   variant="outline"
@@ -301,7 +301,7 @@ export function CompaniesPage() {
                     }))
                   }
                 >
-                  Berikutnya
+                  Next
                 </Button>
               </div>
             </div>
@@ -317,15 +317,15 @@ export function CompaniesPage() {
       >
         <DialogContent>
           <DialogTitle asChild>
-            <h2>{editing ? "Edit company" : "Tambah company"}</h2>
+            <h2>{editing ? "Edit company" : "Add company"}</h2>
           </DialogTitle>
           <DialogDescription>
-            Isi identitas company sesuai data organisasi.
+            Enter the company identity according to organization data.
           </DialogDescription>
           <form className="dialog-form" onSubmit={submit}>
             <div className="form-grid">
               <div className="field">
-                <label htmlFor="company-name">Nama company</label>
+                <label htmlFor="company-name">Company name</label>
                 <input
                   id="company-name"
                   value={form.companyName}
@@ -338,7 +338,7 @@ export function CompaniesPage() {
                 />
               </div>
               <div className="field">
-                <label htmlFor="company-business">Bidang usaha</label>
+                <label htmlFor="company-business">Business sector</label>
                 <input
                   id="company-business"
                   value={form.companyBusiness}
@@ -350,7 +350,7 @@ export function CompaniesPage() {
               </div>
             </div>
             <div className="field">
-              <label htmlFor="company-address">Alamat company</label>
+              <label htmlFor="company-address">Company address</label>
               <textarea
                 id="company-address"
                 value={form.companyAddress}
@@ -362,7 +362,7 @@ export function CompaniesPage() {
               />
             </div>
             <div className="field">
-              <label htmlFor="company-description">Deskripsi</label>
+              <label htmlFor="company-description">Description</label>
               <textarea
                 id="company-description"
                 value={form.companyDescription}
@@ -384,10 +384,10 @@ export function CompaniesPage() {
                 disabled={save.isPending}
                 onClick={() => setFormOpen(false)}
               >
-                Batal
+                Cancel
               </Button>
               <Button disabled={save.isPending}>
-                {save.isPending ? "Menyimpan…" : "Simpan"}
+                {save.isPending ? "Saving…" : "Save"}
               </Button>
             </div>
           </form>
@@ -399,8 +399,8 @@ export function CompaniesPage() {
         onOpenChange={(open) => {
           if (!open && !remove.isPending) setDeleteTarget(null);
         }}
-        title="Hapus company?"
-        description={`${deleteTarget?.companyName ?? "Company"} akan dihapus. Backend akan menolak jika record masih digunakan.`}
+        title="Delete company?"
+        description={`${deleteTarget?.companyName ?? "Company"} will be deleted. The backend will reject the request if the record is still in use.`}
         pending={remove.isPending}
         onConfirm={() => {
           if (deleteTarget && can(user, "companies.delete"))

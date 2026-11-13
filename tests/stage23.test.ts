@@ -584,7 +584,7 @@ test(
                     page,
                 ),
             ),
-            /100 halaman/,
+            /100 pages/,
         );
     },
 );

@@ -8,7 +8,7 @@ export default async function Page() {
   return allowed ? (
     <ModulePlaceholder
       title="SIAP Card"
-      description="Observasi perilaku dan kondisi lapangan."
+      description="Field behavior and condition observations."
     />
   ) : (
     <Forbidden />

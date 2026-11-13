@@ -23,7 +23,7 @@ export function DashboardShell({
   if (status === "loading") {
     return (
       <main className="boot" role="status">
-        Memverifikasi akses…
+        Verifying access…
       </main>
     );
   }
@@ -31,18 +31,18 @@ export function DashboardShell({
   if (!data || data.error || !data.user?.isActive) {
     return (
       <main className="boot">
-        <h1>Akses belum dapat diverifikasi</h1>
+        <h1>Access could not be verified</h1>
 
         <p>
-          Profil tidak tersedia atau sesi sudah berakhir. Konten dilindungi
-          tidak ditampilkan.
+          The profile is unavailable or the session has expired. Protected
+          content is not displayed.
         </p>
 
         <button
           className="btn btn-outline"
           onClick={() => void update().catch(() => undefined)}
         >
-          Coba lagi
+          Try again
         </button>
 
         <button
@@ -53,7 +53,7 @@ export function DashboardShell({
             })
           }
         >
-          Ke halaman login
+          Go to login
         </button>
       </main>
     );
@@ -64,7 +64,7 @@ export function DashboardShell({
   return (
     <div className={cn("app-shell", collapsed && "is-collapsed")}>
       <a className="skip-link" href="#main-content">
-        Langsung ke konten
+        Skip to content
       </a>
 
       <Sidebar user={user} />
@@ -77,9 +77,9 @@ export function DashboardShell({
         </main>
 
         <footer className="app-footer">
-          <span>HSSE · Dahboard bikinan pasya ganteng</span>
+          <span>HSSE · Management Dashboard</span>
 
-          <span>Keselamatan adalah tanggung jawab bersama.</span>
+          <span>Safety is a shared responsibility.</span>
         </footer>
       </div>
     </div>

@@ -26,22 +26,22 @@ export default async function LoginPage() {
               <small>Management System</small>
             </div>
           </div>
-          <h1 id="login-title">Masuk ke akun Anda</h1>
+          <h1 id="login-title">Sign in to your account</h1>
           <p className="muted">
-            Gunakan email dan password kantor untuk melanjutkan.
+            Use your work email and password to continue.
           </p>
           <LoginForm />
           <p className="login-help">
-            Butuh akses atau lupa password?
+            Need access or forgot your password?
             <br />
-            Hubungi Administrator HSSE di organisasi Anda.
+            Contact your organization&apos;s HSSE Administrator.
           </p>
         </div>
         <p className="login-copyright">
-          © 2026 HSSE · K3, Keamanan &amp; Lingkungan
+          © 2026 HSSE · Health, Safety, Security &amp; Environment
         </p>
       </section>
-      <section className="login-story" aria-label="Tentang HSSE">
+      <section className="login-story" aria-label="About HSSE">
         <div className="story-copy">
           <div className="brand">
             <span className="brand-mark">
@@ -49,23 +49,22 @@ export default async function LoginPage() {
             </span>
             <div>
               <strong>HSSE</strong>
-              <small>K3, Keamanan &amp; Lingkungan</small>
+              <small>Health, Safety, Security &amp; Environment</small>
             </div>
           </div>
           <p className="eyebrow">SAFETY IS A SHARED RESPONSIBILITY</p>
           <h2>
-            Kerja aman.
+            Work safely.
             <br />
-            Langkah pasti.
+            Move with confidence.
           </h2>
           <p>
-            Ruang kerja untuk mendukung pengelolaan keselamatan, keamanan, dan
-            lingkungan di organisasi Anda.
+            A workspace for managing health, safety, security, and environment
+            across your organization.
           </p>
         </div>
         <div className="story-footer">
-          <LockKeyhole size={16} /> Akses sesuai wewenang. Keselamatan untuk
-          semua.
+          <LockKeyhole size={16} /> Access by authority. Safety for everyone.
         </div>
       </section>
     </main>

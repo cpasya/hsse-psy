@@ -48,34 +48,34 @@ export function ProfilePage({ user }: { user: UserDTO }) {
   });
 
   const departmentName = !user.departmentId
-    ? "Belum ditetapkan"
+    ? "Not assigned"
     : !canReadDepartment
-      ? "Tidak memiliki izin membaca"
+      ? "No read permission"
       : department.isPending
-        ? "Memuat…"
+        ? "Loading…"
         : department.isError
-          ? "Gagal memuat"
-          : (department.data?.name ?? "Belum tersedia");
+          ? "Failed to load"
+          : (department.data?.name ?? "Unavailable");
 
   const jobPositionName = !user.jobPositionId
-    ? "Belum ditetapkan"
+    ? "Not assigned"
     : !canReadJobPosition
-      ? "Tidak memiliki izin membaca"
+      ? "No read permission"
       : jobPosition.isPending
-        ? "Memuat…"
+        ? "Loading…"
         : jobPosition.isError
-          ? "Gagal memuat"
-          : (jobPosition.data?.name ?? "Belum tersedia");
+          ? "Failed to load"
+          : (jobPosition.data?.name ?? "Unavailable");
 
   const companyName = !user.companyId
-    ? "Belum ditetapkan"
+    ? "Not assigned"
     : !canReadCompany
-      ? "Tidak memiliki izin membaca"
+      ? "No read permission"
       : company.isPending
-        ? "Memuat…"
+        ? "Loading…"
         : company.isError
-          ? "Gagal memuat"
-          : (company.data?.companyName ?? "Belum tersedia");
+          ? "Failed to load"
+          : (company.data?.companyName ?? "Unavailable");
 
   return (
     <>
@@ -83,7 +83,7 @@ export function ProfilePage({ user }: { user: UserDTO }) {
         <div>
           <p className="eyebrow">ACCOUNT SETTINGS</p>
           <h1>Profile</h1>
-          <p className="muted">Informasi akun dan akses efektif Anda.</p>
+          <p className="muted">Your account information and effective permissions.</p>
         </div>
       </div>
 
@@ -118,7 +118,7 @@ export function ProfilePage({ user }: { user: UserDTO }) {
 
           <dl className="profile-information-grid">
             <div>
-              <dt>Nama</dt>
+              <dt>Name</dt>
               <dd>{user.name}</dd>
             </div>
             <div>
@@ -127,7 +127,7 @@ export function ProfilePage({ user }: { user: UserDTO }) {
             </div>
             <div>
               <dt>NIK</dt>
-              <dd>{user.employeeId || "Belum tersedia"}</dd>
+              <dd>{user.employeeId || "Unavailable"}</dd>
             </div>
             <div>
               <dt>Status</dt>
@@ -154,7 +154,7 @@ export function ProfilePage({ user }: { user: UserDTO }) {
           <div className="profile-panel-heading">
             <div>
               <p className="eyebrow">AUTHORIZATION</p>
-              <h2 id="access-title">Hak akses efektif</h2>
+              <h2 id="access-title">Effective permissions</h2>
             </div>
             <ShieldCheck size={22} aria-hidden="true" />
           </div>
@@ -163,14 +163,14 @@ export function ProfilePage({ user }: { user: UserDTO }) {
             <div
               className="table-scroll"
               role="region"
-              aria-label="Tabel hak akses efektif"
+              aria-label="Effective permissions table"
               tabIndex={0}
             >
               <table className="access-table profile-access-table">
                 <thead>
                   <tr>
                     <th scope="col">Resource</th>
-                    <th scope="col">Aksi</th>
+                    <th scope="col">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -192,7 +192,7 @@ export function ProfilePage({ user }: { user: UserDTO }) {
               </table>
             </div>
           ) : (
-            <p className="table-state">Tidak ada permission operasional.</p>
+            <p className="table-state">No operational permissions assigned.</p>
           )}
         </section>
 
@@ -203,10 +203,10 @@ export function ProfilePage({ user }: { user: UserDTO }) {
           <div className="profile-panel-heading">
             <div>
               <p className="eyebrow">SECURITY</p>
-              <h2 id="password-title">Ganti password</h2>
+              <h2 id="password-title">Change password</h2>
               <p className="muted">
-                Setelah berhasil, seluruh sesi dicabut dan Anda harus login
-                kembali.
+                After a successful change, all sessions are revoked and you
+                must sign in again.
               </p>
             </div>
             <KeyRound size={22} aria-hidden="true" />

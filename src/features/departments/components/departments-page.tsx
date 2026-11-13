@@ -29,7 +29,7 @@ import {
 } from "../schemas";
 
 const errorMessage = (error: unknown) =>
-  error instanceof Error ? error.message : "Request gagal";
+  error instanceof Error ? error.message : "Request failed";
 
 export function DepartmentsPage() {
   const { data: session, status } = useSession();
@@ -114,7 +114,7 @@ export function DepartmentsPage() {
     },
     onSuccess: async () => {
       setFormOpen(false);
-      toast.success("Department tersimpan");
+      toast.success("Department saved");
       await refresh();
     },
     onError: (error) => setFormError(errorMessage(error)),
@@ -124,7 +124,7 @@ export function DepartmentsPage() {
     mutationFn: deleteDepartment,
     onSuccess: async () => {
       setDeleteTarget(null);
-      toast.success("Department dihapus");
+      toast.success("Department deleted");
       await refresh();
     },
     onError: (error) => toast.error(errorMessage(error)),
@@ -147,7 +147,7 @@ export function DepartmentsPage() {
       : "departments.create";
 
     if (!can(user, permission)) {
-      setFormError("Permission aksi tidak tersedia");
+      setFormError("Action permission is unavailable");
       return;
     }
 
@@ -165,7 +165,7 @@ export function DepartmentsPage() {
   }
 
   if (status === "loading") {
-    return <p role="status">Memverifikasi akses…</p>;
+    return <p role="status">Verifying access…</p>;
   }
 
   if (!readable) return <Forbidden />;
@@ -177,15 +177,15 @@ export function DepartmentsPage() {
     <>
       <div className="page-heading">
         <div>
-          <p className="eyebrow">ADMINISTRASI</p>
+          <p className="eyebrow">ADMINISTRATION</p>
           <h1>Departments</h1>
-          <p className="muted">Master department dari backend HSSE.</p>
+          <p className="muted">Department master data from the HSSE backend.</p>
         </div>
 
         {can(user, "departments.create") && (
           <Button onClick={() => openForm(null)}>
             <Building2 size={18} />
-            Tambah department
+            Add department
           </Button>
         )}
       </div>
@@ -193,20 +193,20 @@ export function DepartmentsPage() {
       <section className="card access-list">
         <div className="filter-bar">
           <div className="field">
-            <label htmlFor="department-search">Cari department</label>
+            <label htmlFor="department-search">Search departments</label>
             <div className="search-control">
               <Search size={18} aria-hidden="true" />
               <input
                 id="department-search"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Nama department"
+                placeholder="Department name"
               />
             </div>
           </div>
 
           <div className="field">
-            <label htmlFor="department-limit">Per halaman</label>
+            <label htmlFor="department-limit">Per page</label>
             <select
               id="department-limit"
               value={filters.limit}
@@ -220,7 +220,7 @@ export function DepartmentsPage() {
             >
               {[10, 20, 50, 100].map((limit) => (
                 <option key={limit} value={limit}>
-                  {limit} department
+                  {limit} departments
                 </option>
               ))}
             </select>
@@ -228,12 +228,12 @@ export function DepartmentsPage() {
         </div>
 
         {query.isPending ? (
-          <p className="table-state" role="status">Memuat department…</p>
+          <p className="table-state" role="status">Loading departments…</p>
         ) : query.isError ? (
           <div className="notice error" role="alert">
             <span>{errorMessage(query.error)}</span>
             <Button variant="outline" onClick={() => void query.refetch()}>
-              Coba lagi
+              Try again
             </Button>
           </div>
         ) : result ? (
@@ -242,14 +242,14 @@ export function DepartmentsPage() {
               className="table-scroll"
               tabIndex={0}
               role="region"
-              aria-label="Tabel department"
+              aria-label="Departments table"
             >
               <table className="access-table">
                 <thead>
                   <tr>
-                    <th>Nama department</th>
+                    <th>Department name</th>
                     <th>ID</th>
-                    <th>Aksi</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -273,7 +273,7 @@ export function DepartmentsPage() {
                               variant="destructive"
                               onClick={() => setDeleteTarget(department)}
                             >
-                              Hapus
+                              Delete
                             </Button>
                           )}
                         </div>
@@ -285,13 +285,13 @@ export function DepartmentsPage() {
             </div>
 
             {!result.data.length && (
-              <p className="table-state">Tidak ada department yang sesuai.</p>
+              <p className="table-state">No matching departments found.</p>
             )}
 
             <div className="pagination">
               <span>
                 {result.total === 0 ? 0 : (result.page - 1) * result.limit + 1}
-                –{Math.min(result.page * result.limit, result.total)} dari {result.total}
+                –{Math.min(result.page * result.limit, result.total)} of {result.total}
               </span>
 
               <div className="pagination-controls">
@@ -305,7 +305,7 @@ export function DepartmentsPage() {
                     }))
                   }
                 >
-                  Sebelumnya
+                  Previous
                 </Button>
                 <Button
                   variant="outline"
@@ -317,7 +317,7 @@ export function DepartmentsPage() {
                     }))
                   }
                 >
-                  Berikutnya
+                  Next
                 </Button>
               </div>
             </div>
@@ -333,15 +333,15 @@ export function DepartmentsPage() {
       >
         <DialogContent>
           <DialogTitle asChild>
-            <h2>{editing ? "Edit department" : "Tambah department"}</h2>
+            <h2>{editing ? "Edit department" : "Add department"}</h2>
           </DialogTitle>
           <DialogDescription>
-            Nama department untuk referensi employee.
+            Department name used as an employee reference.
           </DialogDescription>
 
           <form className="dialog-form" onSubmit={submit}>
             <div className="field">
-              <label htmlFor="department-name">Nama department</label>
+              <label htmlFor="department-name">Department name</label>
               <input
                 id="department-name"
                 value={name}
@@ -363,10 +363,10 @@ export function DepartmentsPage() {
                 disabled={save.isPending}
                 onClick={() => setFormOpen(false)}
               >
-                Batal
+                Cancel
               </Button>
               <Button disabled={save.isPending}>
-                {save.isPending ? "Menyimpan…" : "Simpan"}
+                {save.isPending ? "Saving…" : "Save"}
               </Button>
             </div>
           </form>
@@ -378,10 +378,10 @@ export function DepartmentsPage() {
         onOpenChange={(open) => {
           if (!open && !remove.isPending) setDeleteTarget(null);
         }}
-        title="Hapus department?"
+        title="Delete department?"
         description={
-          `${deleteTarget?.name ?? "Department"} akan dihapus. ` +
-          "Backend akan menolak jika record masih digunakan."
+          `${deleteTarget?.name ?? "Department"} will be deleted. ` +
+          "The backend will reject the request if the record is still in use."
         }
         pending={remove.isPending}
         onConfirm={() => {

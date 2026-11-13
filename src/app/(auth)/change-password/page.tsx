@@ -6,7 +6,7 @@ import { ChangePasswordForm } from "@/features/auth/components/change-password-f
 import { authOptions } from "@/lib/auth";
 
 export const metadata = {
-  title: "Ganti Password",
+  title: "Change Password",
 };
 
 export default async function ChangePasswordPage() {
@@ -38,29 +38,29 @@ export default async function ChangePasswordPage() {
           </div>
 
           <h1 id="change-password-title">
-            Buat password baru
+            Create a new password
           </h1>
           <p className="muted">
-            Password awal hanya digunakan untuk login pertama.
-            Setelah berhasil, silakan login kembali.
+            The initial password is only used for your first sign-in.
+            After it is changed, please sign in again.
           </p>
 
           <ChangePasswordForm />
         </div>
       </section>
 
-      <section className="login-story" aria-label="Keamanan akun">
+      <section className="login-story" aria-label="Account security">
         <div className="story-copy">
           <LockKeyhole size={40} />
-          <p className="eyebrow">PENGAMANAN AKUN</p>
+          <p className="eyebrow">ACCOUNT SECURITY</p>
           <h2>
-            Password baru.
+            New password.
             <br />
-            Akses lebih aman.
+            More secure access.
           </h2>
           <p>
-            Jangan gunakan kembali password awal atau membagikan
-            password kepada siapa pun.
+            Do not reuse the initial password or share your password with
+            anyone.
           </p>
         </div>
       </section>

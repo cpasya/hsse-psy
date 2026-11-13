@@ -45,7 +45,7 @@ export async function collectReferencePages(
             )
         ) {
             throw new Error(
-                "Daftar referensi berubah saat dimuat. Coba lagi.",
+                "The reference list changed while loading. Try again.",
             );
         }
 
@@ -55,7 +55,7 @@ export async function collectReferencePages(
         for (const item of result.data) {
             if (items.has(item.id)) {
                 throw new Error(
-                    "Referensi duplikat antarhalaman. Muat ulang daftar.",
+                    "Duplicate references were found across pages. Reload the list.",
                 );
             }
 
@@ -65,7 +65,7 @@ export async function collectReferencePages(
         if (!result.hasNextPage) {
             if (items.size !== result.total) {
                 throw new Error(
-                    "Daftar referensi belum lengkap. Coba lagi.",
+                    "The reference list is incomplete. Try again.",
                 );
             }
 
@@ -78,13 +78,13 @@ export async function collectReferencePages(
 
         if (!result.data.length) {
             throw new Error(
-                "Halaman referensi kosong sebelum daftar selesai.",
+                "A reference page was empty before the list was complete.",
             );
         }
     }
 
     throw new Error(
-        "Referensi melebihi 100 halaman. Diperlukan picker server-search; daftar parsial tidak dipakai.",
+        "References exceed 100 pages. A server-side search picker is required; partial data was not used.",
     );
 }
 

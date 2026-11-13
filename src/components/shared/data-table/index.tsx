@@ -84,15 +84,15 @@ export function DataTable<T>({
           </tbody>
         </table>
       </div>
-      {data.length === 0 && <EmptyState message="Belum ada data yang sesuai" />}
+      {data.length === 0 && <EmptyState message="No matching data found" />}
       <div className="pagination">
         <span>
-          {meta.totalItems} hasil · Halaman {meta.page} dari{" "}
+          {meta.totalItems} results · Page {meta.page} of{" "}
           {Math.max(meta.totalPages, 1)}
         </span>
         <div>
           <button
-            aria-label="Halaman sebelumnya"
+            aria-label="Previous page"
             className="icon-btn"
             disabled={!meta.hasPreviousPage}
             onClick={() => onPage(meta.page - 1)}
@@ -100,7 +100,7 @@ export function DataTable<T>({
             <ChevronLeft size={18} />
           </button>
           <button
-            aria-label="Halaman berikutnya"
+            aria-label="Next page"
             className="icon-btn"
             disabled={!meta.hasNextPage}
             onClick={() => onPage(meta.page + 1)}

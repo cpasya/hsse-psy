@@ -76,7 +76,7 @@ import {
 const message = (error: unknown) =>
   error instanceof Error
     ? error.message
-    : "Terjadi kesalahan";
+    : "Something went wrong";
 
 const text = (form: FormData, key: string) =>
   String(form.get(key) ?? "").trim();
@@ -290,7 +290,7 @@ export function UsersPage(
         }));
       }
 
-      toast.success("Data karyawan tersimpan");
+      toast.success("Employee data saved");
 
       await client.invalidateQueries({
         queryKey: ["employees"],
@@ -312,7 +312,7 @@ export function UsersPage(
 
     onSuccess: async () => {
       setDisableTarget(null);
-      toast.success("Karyawan dinonaktifkan");
+      toast.success("Employee disabled");
 
       await client.invalidateQueries({
         queryKey: ["employees"],
@@ -358,7 +358,7 @@ export function UsersPage(
 
     if (!can(user, requiredPermission)) {
       setFormError(
-        "Izin aksi sudah tidak tersedia",
+        "Action permission is no longer available",
       );
       return;
     }
@@ -377,7 +377,7 @@ export function UsersPage(
         status === "disabled"
       ) {
         throw new Error(
-          "Tidak dapat menonaktifkan akun sendiri.",
+          "You cannot disable your own account.",
         );
       }
 
@@ -495,7 +495,7 @@ export function UsersPage(
       <div className="page-heading">
         <div>
           <p className="eyebrow">
-            ADMINISTRASI
+            ADMINISTRATION
           </p>
 
           <h1>Master User</h1>
@@ -508,7 +508,7 @@ export function UsersPage(
             onClick={() => openForm(null)}
           >
             <Plus size={18} />
-            Tambah karyawan
+            Add employee
           </Button>
         )}
       </div>
@@ -520,7 +520,7 @@ export function UsersPage(
         />
 
         <span>
-          Akses Halaman Dilindungi.
+          Protected page access.
         </span>
       </div>
 
@@ -531,12 +531,12 @@ export function UsersPage(
         <div className="section-heading">
           <div>
             <h2 id="employees-title">
-              Daftar karyawan
+              Employee list
             </h2>
 
             <p className="muted">
-              Kelola identitas dan status akun
-              di organisasi Anda.
+              Manage employee identities and account
+              status across your organization.
             </p>
           </div>
 
@@ -550,7 +550,7 @@ export function UsersPage(
         <div className="filter-bar">
           <div className="field">
             <label htmlFor="employee-search">
-              Cari karyawan
+              Search employees
             </label>
 
             <div className="search-control">
@@ -565,7 +565,7 @@ export function UsersPage(
                 onChange={(event) =>
                   setSearch(event.target.value)
                 }
-                placeholder="Nama, email, atau nomor karyawan"
+                placeholder="Name, email, or employee number"
               />
             </div>
           </div>
@@ -589,7 +589,7 @@ export function UsersPage(
               }
             >
               <option value="">
-                Semua status
+                All statuses
               </option>
 
               {[
@@ -605,7 +605,7 @@ export function UsersPage(
 
           <div className="field employee-filter-select">
             <label htmlFor="employee-limit">
-              Per halaman
+              Per page
             </label>
 
             <select
@@ -627,7 +627,7 @@ export function UsersPage(
                     key={limit}
                     value={limit}
                   >
-                    {limit} karyawan
+                    {limit} employees
                   </option>
                 ),
               )}
@@ -643,7 +643,7 @@ export function UsersPage(
               className="table-state"
               role="status"
             >
-              Memuat / menyesuaikan halaman…
+              Loading / adjusting page…
             </p>
           )}
 
@@ -660,7 +660,7 @@ export function UsersPage(
                 void query.refetch()
               }
             >
-              Coba lagi
+              Try again
             </Button>
           </div>
         )}
@@ -672,23 +672,23 @@ export function UsersPage(
               <div
                 className="table-scroll"
                 role="region"
-                aria-label="Tabel karyawan, geser untuk melihat kolom lainnya"
+                aria-label="Employees table, scroll to view additional columns"
                 tabIndex={0}
               >
                 <table className="employee-table">
                   <caption className="sr-only">
-                    Daftar karyawan dari backend HSSE
+                    Employee list from the HSSE backend
                   </caption>
 
                   <thead>
                     <tr>
                       {[
-                        "Nama",
+                        "Name",
                         "Email",
-                        "Nomor karyawan",
+                        "Employee number",
                         "Status",
                         // "Role ID",
-                        "Aksi",
+                        "Actions",
                       ].map((label) => (
                         <th
                           key={label}
@@ -763,7 +763,7 @@ export function UsersPage(
                                     prefetchEmployee(employee.id)
                                   }
                                 >
-                                  Detail &amp; akses
+                                  Details &amp; access
                                 </Link>
                               </Button>
 
@@ -782,7 +782,7 @@ export function UsersPage(
                                       )
                                     }
                                   >
-                                    Edit profil
+                                    Edit profile
                                   </Button>
                                 )}
 
@@ -805,7 +805,7 @@ export function UsersPage(
                                       )
                                     }
                                   >
-                                    Nonaktifkan
+                                    Disable
                                   </Button>
                                 )}
                             </div>
@@ -827,21 +827,21 @@ export function UsersPage(
                   </span>
 
                   <strong>
-                    Belum ada karyawan yang sesuai
+                    No matching employees found
                   </strong>
 
                   <p>
-                    Coba ubah pencarian atau
-                    filter status.
+                    Try changing the search query or
+                    status filter.
                   </p>
                 </div>
               )}
 
               <div className="pagination">
                 <span aria-live="polite">
-                  {first}–{last} dari{" "}
-                  {result.total} karyawan ·
-                  Halaman {result.page} dari{" "}
+                  {first}–{last} of{" "}
+                  {result.total} employees ·
+                  Page {result.page} of{" "}
                   {result.totalPages}
                 </span>
 
@@ -860,7 +860,7 @@ export function UsersPage(
                     }
                   >
                     <ChevronLeft size={16} />
-                    Sebelumnya
+                    Previous
                   </Button>
 
                   <Button
@@ -876,7 +876,7 @@ export function UsersPage(
                       }))
                     }
                   >
-                    Berikutnya
+                    Next
                     <ChevronRight size={16} />
                   </Button>
                 </div>
@@ -895,8 +895,8 @@ export function UsersPage(
             setDisableTarget(null);
           }
         }}
-        title="Nonaktifkan karyawan?"
-        description={`${disableTarget?.name ?? "Karyawan"} tidak akan dapat mengakses aplikasi. Sesi backend miliknya akan dicabut.`}
+        title="Disable employee?"
+        description={`${disableTarget?.name ?? "Employee"} will no longer be able to access the application. Their backend sessions will be revoked.`}
         pending={disable.isPending}
         onConfirm={() => {
           if (
@@ -930,8 +930,8 @@ export function UsersPage(
           <DialogTitle asChild>
             <h2>
               {editing
-                ? "Edit karyawan"
-                : "Tambah karyawan"}
+                ? "Edit employee"
+                : "Add employee"}
             </h2>
           </DialogTitle>
 
@@ -967,12 +967,12 @@ export function UsersPage(
                       referrerPolicy="no-referrer"
                     />
                   ) : (
-                    initials(editing?.name ?? "Karyawan")
+                    initials(editing?.name ?? "Employee")
                   )}
                 </span>
 
                 <label htmlFor="employee-image">
-                  Foto profil
+                  Profile photo
                 </label>
 
                 <input
@@ -992,9 +992,9 @@ export function UsersPage(
                 />
 
                 <small>
-                  JPEG atau PNG, maksimal 2 MB.
+                  JPEG or PNG, maximum 2 MB.
                   {editing?.image
-                    ? " Kosongkan untuk mempertahankan foto saat ini."
+                    ? " Leave empty to keep the current photo."
                     : ""}
                 </small>
               </div>
@@ -1002,7 +1002,7 @@ export function UsersPage(
               <div className="form-grid">
                 <div className="field">
                   <label htmlFor="employee-name">
-                    Nama
+                    Name
                   </label>
 
                   <input
@@ -1043,7 +1043,7 @@ export function UsersPage(
 
                 <div className="field">
                   <label htmlFor="employee-number">
-                    Nomor karyawan
+                    Employee number
                   </label>
 
                   <input
@@ -1058,7 +1058,7 @@ export function UsersPage(
 
                 <div className="field">
                   <label htmlFor="employee-phone">
-                    Telepon
+                    Phone
                   </label>
 
                   <input
@@ -1172,13 +1172,13 @@ export function UsersPage(
                 disabled={save.isPending}
                 onClick={closeForm}
               >
-                Batal
+                Cancel
               </Button>
 
               <Button disabled={save.isPending}>
                 {save.isPending
-                  ? "Menyimpan…"
-                  : "Simpan"}
+                  ? "Saving…"
+                  : "Save"}
               </Button>
             </div>
           </form>

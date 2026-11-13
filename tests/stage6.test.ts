@@ -168,7 +168,7 @@ test("Navigation, routes, gateway, and employee picker use exact permissions", (
   assert.ok(profile.includes("getDepartment"));
   assert.ok(profile.includes("getJobPosition"));
   assert.ok(profile.includes("getCompany"));
-  assert.ok(profile.includes("Tabel hak akses efektif"));
+  assert.ok(profile.includes("Effective permissions table"));
   assert.ok(profile.includes("ChangePasswordForm"));
   assert.ok(profileRoute.includes("requireSession()"));
 });

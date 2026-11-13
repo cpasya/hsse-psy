@@ -60,8 +60,8 @@ test("Zod resolver maps login validation errors", async () => {
     },
   );
 
-  assert.equal(result.errors.email?.message, "Email tidak valid");
-  assert.equal(result.errors.password?.message, "Password wajib diisi");
+  assert.equal(result.errors.email?.message, "Invalid email address");
+  assert.equal(result.errors.password?.message, "Password is required");
 });
 
 test(

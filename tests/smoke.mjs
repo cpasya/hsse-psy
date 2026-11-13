@@ -64,7 +64,7 @@ try {
     if (new URL(req.url()).origin !== base) external++;
   });
   await page.goto(base + "/login");
-  await page.getByLabel("Email kantor", { exact: true }).waitFor();
+  await page.getByLabel("Work email", { exact: true }).waitFor();
   await page.getByLabel("Password", { exact: true }).waitFor();
   assert.equal(await page.locator(".demo-credentials,.demo-banner").count(), 0);
   checks.push(

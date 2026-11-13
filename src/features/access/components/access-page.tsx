@@ -56,7 +56,7 @@ export function AccessPage({
     const { data: session, status } = useSession();
 
     if (status === "loading") {
-        return <p role="status">Memverifikasi akses…</p>;
+        return <p role="status">Verifying access…</p>;
     }
 
     if (
@@ -204,18 +204,18 @@ function AccessContent({
 
             if (!next || next.error) {
                 toast.error(
-                    "Data tersimpan, tetapi akses belum dapat diverifikasi ulang.",
+                    "Data was saved, but access could not be verified again.",
                 );
             }
         } catch {
             toast.error(
-                "Data tersimpan. Perbarui akses sebelum melanjutkan.",
+                "Data was saved. Refresh access before continuing.",
             );
         }
     }
 
     async function saved() {
-        toast.success("Perubahan tersimpan");
+        toast.success("Changes saved");
         await refresh();
     }
 
@@ -238,7 +238,7 @@ function AccessContent({
                     current.isSystem ||
                     current.id === user.roleId
                 ) {
-                    throw new Error("Role ini dilindungi");
+                    throw new Error("This role is protected");
                 }
             }
 
@@ -282,24 +282,24 @@ function AccessContent({
 
     const editorTitle = resource === "roles"
         ? editor?.mode === "new"
-            ? "Tambah role"
+            ? "Add role"
             : "Edit role"
         : editor?.record
             ? "Edit permission"
-            : "Tambah permission";
+            : "Add permission";
 
     return (
         <>
             <div className="page-heading">
                 <div>
                     <p className="eyebrow">
-                        Administrasi akses
+                        Access administration
                     </p>
 
                     <h1>{title}</h1>
 
                     <p className="muted">
-                        Data dan otorisasi berasal dari backend HSSE.
+                        Data and authorization are provided by the HSSE backend.
                     </p>
                 </div>
 
@@ -317,7 +317,7 @@ function AccessContent({
                             })
                         }
                     >
-                        Tambah{" "}
+                        Add{" "}
                         {resource === "roles"
                             ? "role"
                             : "permission"}
@@ -326,8 +326,8 @@ function AccessContent({
             </div>
 
             <div className="notice">
-                Pengaman UI: record sistem read-only, role akun sendiri
-                tidak dapat diubah/dihapus di halaman ini.
+                UI safeguard: system records are read-only, and the current
+                account role cannot be changed or deleted on this page.
                 {/* Ini bukan pengganti validasi backend. */}
             </div>
 
@@ -335,7 +335,7 @@ function AccessContent({
                 <div className="filter-bar">
                     <div className="field">
                         <label htmlFor="access-search">
-                            Cari {title}
+                            Search {title}
                         </label>
 
                         <input
@@ -349,7 +349,7 @@ function AccessContent({
 
                     <div className="field">
                         <label htmlFor="access-limit">
-                            Per halaman
+                            Per page
                         </label>
 
                         <select
@@ -365,7 +365,7 @@ function AccessContent({
                         >
                             {[2, 10, 20, 50, 100].map((n) => (
                                 <option key={n} value={n}>
-                                    {n} data
+                                    {n} records
                                 </option>
                             ))}
                         </select>
@@ -374,7 +374,7 @@ function AccessContent({
 
                 {query.isPending ? (
                     <p className="table-state" role="status">
-                        Memuat…
+                        Loading…
                     </p>
                 ) : query.isError ? (
                     <div className="notice error" role="alert">
@@ -384,7 +384,7 @@ function AccessContent({
                             variant="outline"
                             onClick={() => void query.refetch()}
                         >
-                            Coba lagi
+                            Try again
                         </Button>
                     </div>
                 ) : data && (
@@ -393,19 +393,19 @@ function AccessContent({
                             className="table-scroll"
                             tabIndex={0}
                             role="region"
-                            aria-label={`Tabel ${title}`}
+                            aria-label={`${title} table`}
                         >
                             <table className="access-table">
                                 <thead>
                                     <tr>
                                         <th>
                                             {resource === "roles"
-                                                ? "Nama role"
-                                                : "Kode permission"}
+                                                ? "Role name"
+                                                : "Permission code"}
                                         </th>
-                                        <th>Deskripsi</th>
+                                        <th>Description</th>
                                         <th>Status</th>
-                                        <th>Aksi</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
 
@@ -430,13 +430,13 @@ function AccessContent({
 
                                             <td>
                                                 {row.isSystem
-                                                    ? "Sistem"
+                                                    ? "System"
                                                     : "Custom"}
 
                                                 {"isActive" in row
                                                     ? row.isActive
-                                                        ? " · Aktif"
-                                                        : " · Nonaktif"
+                                                        ? " · Active"
+                                                        : " · Inactive"
                                                     : ""}
                                             </td>
 
@@ -453,7 +453,7 @@ function AccessContent({
                                                                 })
                                                             }
                                                         >
-                                                            Detail
+                                                            Details
                                                         </Button>
                                                     )}
 
@@ -490,7 +490,7 @@ function AccessContent({
                                                                     })
                                                                 }
                                                             >
-                                                                Atur permission
+                                                                Manage permissions
                                                             </Button>
                                                         )}
 
@@ -502,7 +502,7 @@ function AccessContent({
                                                                     setTarget(row)
                                                                 }
                                                             >
-                                                                Hapus
+                                                                Delete
                                                             </Button>
                                                         )}
 
@@ -522,7 +522,7 @@ function AccessContent({
 
                         {!data.data.length && (
                             <p className="table-state">
-                                Tidak ada data yang sesuai.
+                                No matching data found.
                             </p>
                         )}
 
@@ -536,9 +536,9 @@ function AccessContent({
                                     data.page * data.limit,
                                     data.total,
                                 )}
-                                {" "}dari {data.total}
-                                {" "}· Halaman {data.page}
-                                {" "}dari {data.totalPages}
+                                {" "}of {data.total}
+                                {" "}· Page {data.page}
+                                {" "}of {data.totalPages}
                             </span>
 
                             <div className="pagination-controls">
@@ -554,7 +554,7 @@ function AccessContent({
                                         }))
                                     }
                                 >
-                                    Sebelumnya
+                                    Previous
                                 </Button>
 
                                 <Button
@@ -569,7 +569,7 @@ function AccessContent({
                                         }))
                                     }
                                 >
-                                    Berikutnya
+                                    Next
                                 </Button>
                             </div>
                         </div>
@@ -600,7 +600,7 @@ function AccessContent({
                     if (!value && !busy) setTarget(null);
                 }}
                 title={
-                    `Hapus ${resource === "roles"
+                    `Delete ${resource === "roles"
                         ? "role"
                         : "permission"}?`
                 }
@@ -610,9 +610,8 @@ function AccessContent({
                             ? target.name
                             : `${target.resource}.${target.action}`
                         : ""
-                    }. Backend dapat menolak record yang masih ` +
-                    "direferensikan. Penghapusan dapat memengaruhi " +
-                    "akses pengguna."
+                    }. The backend may reject a record that is still ` +
+                    "referenced. Deletion may affect user access."
                 }
                 pending={busy}
                 onConfirm={() => void remove()}

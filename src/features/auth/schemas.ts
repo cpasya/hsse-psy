@@ -4,36 +4,36 @@ export const loginSchema = z.object({
   email: z
     .string()
     .trim()
-    .email("Email tidak valid"),
+    .email("Invalid email address"),
 
   password: z
     .string()
-    .min(1, "Password wajib diisi"),
+    .min(1, "Password is required"),
 
   rememberMe: z.boolean().optional(),
 });
 
 const strongPassword = z
   .string()
-  .min(12, "Password minimal 12 karakter")
-  .max(128, "Password maksimal 128 karakter")
-  .regex(/[A-Z]/, "Password harus memiliki minimal satu huruf kapital")
-  .regex(/[0-9]/, "Password harus memiliki minimal satu angka")
+  .min(12, "Password must be at least 12 characters")
+  .max(128, "Password must be at most 128 characters")
+  .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+  .regex(/[0-9]/, "Password must contain at least one number")
   .regex(
     /[^A-Za-z0-9]/,
-    "Password harus memiliki minimal satu simbol",
+    "Password must contain at least one symbol",
   );
 
 export const changePasswordSchema = z
   .object({
     password: strongPassword,
-    confirmPassword: z.string().min(1, "Konfirmasi password wajib diisi"),
+    confirmPassword: z.string().min(1, "Password confirmation is required"),
   })
   .strict()
   .refine(
     (value) => value.password === value.confirmPassword,
     {
-      message: "Password dan konfirmasi password harus sama",
+      message: "Password and confirmation must match",
       path: ["confirmPassword"],
     },
   );

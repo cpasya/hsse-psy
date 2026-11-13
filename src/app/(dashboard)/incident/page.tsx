@@ -7,7 +7,7 @@ export default async function Page() {
   return allowed ? (
     <IntegrationPending
       title="Incident Management"
-      description="Wadah daftar laporan insiden dari backend."
+      description="Incident report list from the backend."
     />
   ) : (
     <Forbidden />

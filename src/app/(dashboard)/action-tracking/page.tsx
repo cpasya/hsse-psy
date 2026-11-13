@@ -8,7 +8,7 @@ export default async function Page() {
   return allowed ? (
     <ModulePlaceholder
       title="Action Tracking"
-      description="Pusat tindak lanjut temuan dan CAPA."
+      description="Centralized follow-up for findings and CAPA."
     />
   ) : (
     <Forbidden />

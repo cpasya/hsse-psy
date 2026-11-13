@@ -11,10 +11,10 @@ export function ErrorState({
   return (
     <div className="state">
       <AlertCircle />
-      <h3>Data belum dapat dimuat</h3>
+      <h3>Data could not be loaded</h3>
       <p>{message}</p>
       <Button variant="outline" onClick={retry}>
-        Coba lagi
+        Try again
       </Button>
     </div>
   );
@@ -24,13 +24,13 @@ export function EmptyState({ message }: { message: string }) {
     <div className="state">
       <Inbox />
       <h3>{message}</h3>
-      <p>Coba ubah pencarian atau reset filter Anda.</p>
+      <p>Try changing your search or resetting the filters.</p>
     </div>
   );
 }
 export function Skeleton({ rows = 5 }: { rows?: number }) {
   return (
-    <div className="skeleton-wrap" role="status" aria-label="Memuat data">
+    <div className="skeleton-wrap" role="status" aria-label="Loading data">
       {Array.from({ length: rows }, (_, i) => (
         <div key={i} className="skeleton" />
       ))}

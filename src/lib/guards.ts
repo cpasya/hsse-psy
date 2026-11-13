@@ -14,7 +14,7 @@ export const requireSession = cache(async function requireSession() {
     session?.error === "ProfileUnavailable"
   ) {
     throw new Error(
-      "Profil akses belum dapat diverifikasi. Coba lagi saat layanan tersedia.",
+      "Your access profile could not be verified. Try again when the service is available.",
     );
   }
 

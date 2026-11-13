@@ -2,10 +2,10 @@ import Link from "next/link";
 export default function NotFound() {
   return (
     <main className="boot">
-      <h1>404 · Halaman tidak ditemukan</h1>
-      <p>Alamat yang Anda cari tidak tersedia.</p>
+      <h1>404 · Page not found</h1>
+      <p>The address you are looking for is unavailable.</p>
       <Link href="/dashboard" className="btn btn-outline">
-        Kembali ke dashboard
+        Back to dashboard
       </Link>
     </main>
   );

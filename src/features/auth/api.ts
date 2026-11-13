@@ -70,7 +70,7 @@ async function authRequest(
   } catch {
     throw new AuthApiError(
       502,
-      "Layanan autentikasi tidak dapat dihubungi",
+      "The authentication service could not be reached",
     );
   }
 
@@ -80,8 +80,8 @@ async function authRequest(
 
       response.status === 401 ||
         response.status === 403
-        ? "Autentikasi ditolak. Periksa akun atau login kembali."
-        : `Layanan autentikasi gagal (${response.status})`,
+        ? "Authentication was rejected. Check your account or sign in again."
+        : `Authentication service failed (${response.status})`,
     );
   }
 
@@ -98,7 +98,7 @@ async function authRequest(
   } catch {
     throw new AuthApiError(
       502,
-      "Respons autentikasi tidak valid",
+      "Invalid authentication response",
     );
   }
 
@@ -131,11 +131,11 @@ export async function getProfile(
           .map((issue) => issue.path.join("."))
           .filter(Boolean)
           .join(", ")
-        : "tidak diketahui";
+        : "unknown";
 
       throw new AuthApiError(
         502,
-        `Format profil/permissions backend tidak sesuai kontrak (${fields})`,
+        `The backend profile/permissions response does not match the expected format (${fields})`,
       );
     }
   }, force);
@@ -187,7 +187,7 @@ export async function login(
   if (!result.success) {
     throw new AuthApiError(
       502,
-      "Format respons login tidak sesuai kontrak",
+      "The login response does not match the expected format",
     );
   }
 
@@ -199,14 +199,14 @@ export async function login(
     if (profile.id !== result.data.user.id) {
       throw new AuthApiError(
         401,
-        "Identitas sesi tidak sesuai",
+        "Session identity mismatch",
       );
     }
 
     if (!profile.isActive) {
       throw new AuthApiError(
         403,
-        "Akun belum aktif atau telah dinonaktifkan",
+        "The account is not active or has been disabled",
       );
     }
 
@@ -244,7 +244,7 @@ export async function refreshToken(
   if (!result.success) {
     throw new AuthApiError(
       502,
-      "Format respons refresh tidak sesuai kontrak",
+      "The refresh response does not match the expected format",
     );
   }
 

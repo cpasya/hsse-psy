@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const name = z.string().trim().min(1, "Nama department wajib diisi");
+const name = z.string().trim().min(1, "Department name is required");
 
 export const departmentSchema = z.object({
   id: z.string().uuid(),
@@ -15,7 +15,7 @@ export const updateDepartmentSchema = createDepartmentSchema
   .partial()
   .refine(
     (value) => Object.keys(value).length > 0,
-    "Tidak ada perubahan",
+    "No changes were submitted",
   );
 
 export type DepartmentRecord = z.infer<typeof departmentSchema>;

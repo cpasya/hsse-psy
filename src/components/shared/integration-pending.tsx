@@ -22,18 +22,18 @@ export function IntegrationPending({
         <div className="placeholder-icon">
           <Database size={32} />
         </div>
-        <h2>Sumber data belum dihubungkan</h2>
+        <h2>Data source not connected</h2>
         <p>
-          Halaman ini disiapkan untuk data backend. Daftar, formulir, dan aksi
-          transaksi akan tersedia setelah kontrak API modul ini dikonfirmasi.
+          This page is prepared for backend data. Lists, forms, and transaction
+          actions will be available after the module API contract is confirmed.
         </p>
         <div className="notice">
           <LockKeyhole size={18} />
-          Tidak ada data contoh, penyimpanan lokal, atau request ke endpoint
-          yang belum disepakati.
+          No sample data, local storage, or requests to unconfirmed endpoints
+          are used.
         </div>
         <Link className="btn btn-outline" href="/dashboard">
-          Kembali ke dashboard
+          Back to dashboard
         </Link>
       </section>
     </>

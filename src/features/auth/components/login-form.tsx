@@ -41,7 +41,7 @@ export function LoginForm() {
       if (result?.error) {
         setError(
           result.error === "CredentialsSignin"
-            ? "Email atau password salah"
+            ? "Incorrect email or password"
             : result.error,
         );
         return;
@@ -55,18 +55,18 @@ export function LoginForm() {
           : callbackUrl,
       );
     } catch {
-      setError("Server tidak dapat dihubungi. Silakan coba lagi.");
+      setError("The server could not be reached. Please try again.");
     }
   }
   return (
     <form onSubmit={handleSubmit(submit)} className="login-form" noValidate>
       <div className="field">
-        <label htmlFor="email">Email kantor</label>
+        <label htmlFor="email">Work email</label>
         <input
           id="email"
           type="email"
           autoComplete="username"
-          placeholder="nama@perusahaan.co.id"
+          placeholder="name@company.com"
           disabled={isSubmitting}
           aria-invalid={!!errors.email}
           {...register("email")}
@@ -80,7 +80,7 @@ export function LoginForm() {
             id="password"
             type={show ? "text" : "password"}
             autoComplete="current-password"
-            placeholder="Masukkan password"
+          placeholder="Enter your password"
             disabled={isSubmitting}
             aria-invalid={!!errors.password}
             {...register("password")}
@@ -89,7 +89,7 @@ export function LoginForm() {
             type="button"
             className="icon-btn"
             disabled={isSubmitting}
-            aria-label={show ? "Sembunyikan password" : "Tampilkan password"}
+            aria-label={show ? "Hide password" : "Show password"}
             onClick={() => setShow(!show)}
           >
             {show ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -107,7 +107,7 @@ export function LoginForm() {
       )}
       <Button className="full" disabled={isSubmitting}>
         {isSubmitting ? <Loader2 size={18} className="spin" /> : null}
-        {isSubmitting ? "Menghubungkan…" : "Masuk ke Dashboard"}
+        {isSubmitting ? "Signing in…" : "Sign in to Dashboard"}
         <ArrowRight size={18} />
       </Button>
     </form>

@@ -1,10 +1,10 @@
 import { z } from "zod";
 
-const text = z.string().trim().min(1, "Tidak boleh kosong");
+const text = z.string().trim().min(1, "This field is required");
 
 const ids = z.array(z.string().uuid()).refine(
     (items) => new Set(items).size === items.length,
-    "Permission duplikat",
+    "Duplicate permissions",
 );
 
 export const roleSchema = z.object({
@@ -34,7 +34,7 @@ export const roleDetailSchema = roleSchema.extend({
     permissions: z.array(permissionAtomSchema).refine(
         (items) =>
             new Set(items.map((item) => item.id)).size === items.length,
-        "Detail role berisi permission duplikat",
+        "Role details contain duplicate permissions",
     ),
 });
 
@@ -43,7 +43,7 @@ export const createRoleSchema = z.object({
     description: z.string().trim().optional(),
     permissionIds: ids.refine(
         (items) => items.length > 0,
-        "Pilih minimal satu permission",
+        "Select at least one permission",
     ),
 }).strict();
 
@@ -53,7 +53,7 @@ export const updateRoleSchema = createRoleSchema
     .strict()
     .refine(
         (value) => Object.keys(value).length > 0,
-        "Tidak ada perubahan",
+        "No changes were submitted",
     );
 
 export const assignmentSchema = z.object({
@@ -72,7 +72,7 @@ export const updatePermissionSchema = createPermissionSchema
     .strict()
     .refine(
         (value) => Object.keys(value).length > 0,
-        "Tidak ada perubahan",
+        "No changes were submitted",
     );
 
 export type RoleRecord = z.infer<typeof roleSchema>;
@@ -109,7 +109,7 @@ export function validateSelection(
 
     if (invalid) {
         throw new Error(
-            "Permission baru harus aktif dan berasal dari katalog lengkap",
+            "New permissions must be active and come from the complete catalogue",
         );
     }
 }

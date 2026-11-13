@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-const companyName = z.string().trim().min(1, "Nama company wajib diisi");
-const companyAddress = z.string().trim().min(1, "Alamat company wajib diisi");
+const companyName = z.string().trim().min(1, "Company name is required");
+const companyAddress = z.string().trim().min(1, "Company address is required");
 const optionalText = z.string().trim().nullable().optional();
 
 export const companySchema = z.object({
@@ -23,7 +23,7 @@ export const createCompanySchema = z
 
 export const updateCompanySchema = createCompanySchema
   .partial()
-  .refine((value) => Object.keys(value).length > 0, "Tidak ada perubahan");
+  .refine((value) => Object.keys(value).length > 0, "No changes were submitted");
 
 export type CompanyRecord = z.infer<typeof companySchema>;
 export type CreateCompanyPayload = z.infer<typeof createCompanySchema>;

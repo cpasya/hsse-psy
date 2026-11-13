@@ -21,18 +21,17 @@ export function ModulePlaceholder({
         <div className="placeholder-icon">
           <Wrench size={32} />
         </div>
-        <h2>Ruang untuk langkah berikutnya.</h2>
+        <h2>Ready for the next step.</h2>
         <p>
-          Modul ini masih dalam tahap perencanaan. Kontrak API, alur
-          persetujuan, dan kebijakan data belum disepakati.
+          This module is still being planned. Its API contract, approval flow,
+          and data policies have not been finalized.
         </p>
         <div className="notice">
           <LockKeyhole size={18} />
-          Tidak ada data operasional atau aksi unggah yang disimulasikan di
-          sini.
+          No operational data or upload actions are simulated here.
         </div>
         <Link className="btn btn-outline" href="/dashboard">
-          Kembali ke dashboard <ArrowUpRight size={18} />
+          Back to dashboard <ArrowUpRight size={18} />
         </Link>
       </section>
     </>
@@ -42,10 +41,10 @@ export function Forbidden() {
   return (
     <section className="card state">
       <LockKeyhole size={32} />
-      <h1>403 · Akses dibatasi</h1>
-      <p>Peran Anda tidak memiliki izin untuk membuka modul ini.</p>
+      <h1>403 · Access restricted</h1>
+      <p>Your account does not have permission to open this module.</p>
       <Link className="btn btn-outline" href="/dashboard">
-        Kembali ke dashboard
+        Back to dashboard
       </Link>
     </section>
   );

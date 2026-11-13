@@ -56,12 +56,12 @@ export function Topbar({ user }: { user: UserDTO }) {
       const session = await update();
 
       if (!session || session.error) {
-        throw new Error("Profil akses belum dapat diverifikasi");
+        throw new Error("Access profile could not be verified");
       }
 
-      toast.success("Profil dan akses diperbarui");
+      toast.success("Profile and access updated");
     } catch {
-      toast.error("Akses belum dapat diperbarui. Coba lagi.");
+      toast.error("Access could not be updated. Try again.");
     } finally {
       setBusy(false);
     }
@@ -72,7 +72,7 @@ export function Topbar({ user }: { user: UserDTO }) {
       const response = await fetch("/api/session/logout", { method: "POST" });
 
       if (!response.ok) {
-        toast.warning("Sesi lokal ditutup; pencabutan token server gagal.");
+        toast.warning("Local session closed; server token revocation failed.");
       }
     } finally {
       await signOut({ callbackUrl: "/login" });
@@ -84,7 +84,7 @@ export function Topbar({ user }: { user: UserDTO }) {
       <div className="topbar-context">
         <button
           className="icon-btn hamburger"
-          aria-label="Buka atau ringkas navigasi"
+          aria-label="Open or collapse navigation"
           aria-controls="primary-sidebar"
           aria-expanded={mobileOpen || !collapsed}
           onClick={toggleNavigation}
@@ -105,7 +105,7 @@ export function Topbar({ user }: { user: UserDTO }) {
 
         <button
           className="icon-btn"
-          aria-label="Perbarui akses"
+          aria-label="Refresh access"
           disabled={busy}
           onClick={() => void refreshAccess()}
         >
@@ -114,7 +114,7 @@ export function Topbar({ user }: { user: UserDTO }) {
 
         <button
           className="icon-btn"
-          aria-label="Notifikasi"
+          aria-label="Notifications"
           onClick={() => setNotice(true)}
         >
           <Bell size={20} />
@@ -122,7 +122,7 @@ export function Topbar({ user }: { user: UserDTO }) {
 
         <DropdownMenu.Root>
           <DropdownMenu.Trigger asChild>
-            <button className="profile-button" aria-label="Buka menu akun">
+            <button className="profile-button" aria-label="Open account menu">
               <span className="avatar small" aria-hidden="true">
                 {user.image ? (
                   <img src={user.image} alt="" referrerPolicy="no-referrer" />
@@ -173,11 +173,11 @@ export function Topbar({ user }: { user: UserDTO }) {
       <Dialog open={notice} onOpenChange={setNotice}>
         <DialogContent>
           <DialogTitle asChild>
-            <h2>Notifikasi</h2>
+            <h2>Notifications</h2>
           </DialogTitle>
 
           <DialogDescription>
-            Layanan notifikasi belum dihubungkan.
+            The notification service has not been connected.
           </DialogDescription>
         </DialogContent>
       </Dialog>

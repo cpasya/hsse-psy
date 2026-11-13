@@ -10,7 +10,7 @@ import type { DashboardSnapshot } from "../types";
 export function Dashboard({ data }: { data?: DashboardSnapshot }) {
   const cards = [
     {
-      label: "Laporan Insiden",
+      label: "Incident Reports",
       value: data?.metrics.incidents,
       icon: TriangleAlert,
     },
@@ -20,12 +20,12 @@ export function Dashboard({ data }: { data?: DashboardSnapshot }) {
       icon: ListChecks,
     },
     {
-      label: "Risiko Tinggi",
+      label: "High Risks",
       value: data?.metrics.highRisks,
       icon: ShieldAlert,
     },
     {
-      label: "Penyelesaian Inspeksi",
+      label: "Inspection Completion",
       value: data?.metrics.inspectionCompletion,
       icon: ClipboardCheck,
       percent: true,
@@ -40,16 +40,16 @@ export function Dashboard({ data }: { data?: DashboardSnapshot }) {
             Dashboard HSSE<span className="heading-dot">.</span>
           </h1>
           <p className="muted">
-            Ringkasan operasional dari sumber data yang terverifikasi.
+            Operational summary from verified data sources.
           </p>
         </div>
         <span className="badge neutral">
-          {data ? "Data API" : "Menunggu integrasi API"}
+          {data ? "API Data" : "Awaiting API Integration"}
         </span>
       </div>
       {!data && (
         <div className="notice" role="status">
-          Sumber data dashboard belum dihubungkan. Mohon bersabar ya.. hehee
+          The dashboard data source has not been connected yet.
         </div>
       )}
       <div className="metrics-grid">
@@ -68,8 +68,8 @@ export function Dashboard({ data }: { data?: DashboardSnapshot }) {
             </strong>
             <small>
               {card.value === null || card.value === undefined
-                ? "Data belum tersedia"
-                : "Dari sumber API"}
+                ? "Data unavailable"
+                : "From API source"}
             </small>
           </section>
         ))}
@@ -77,7 +77,7 @@ export function Dashboard({ data }: { data?: DashboardSnapshot }) {
       <div className="analytics-grid">
         <section className="card placeholder">
           <Activity size={28} />
-          <h2>Tren laporan</h2>
+          <h2>Report Trends</h2>
           {/* <p>
             Grafik akan ditampilkan setelah kontrak data tren dan API
             disepakati. Tidak ada angka atau grafik pengganti.
@@ -85,7 +85,7 @@ export function Dashboard({ data }: { data?: DashboardSnapshot }) {
         </section>
         <section className="card placeholder">
           <ListChecks size={28} />
-          <h2>Tindak lanjut prioritas</h2>
+          <h2>Priority Follow-ups</h2>
           {/* <p>
             Daftar tindak lanjut menunggu sumber data operasional. Tidak ada
             entri contoh yang ditampilkan.
@@ -93,7 +93,7 @@ export function Dashboard({ data }: { data?: DashboardSnapshot }) {
         </section>
       </div>
       <section className="card placeholder">
-        <h2>Aktivitas terbaru</h2>
+        <h2>Recent Activity</h2>
         {/* <p>
           Riwayat aktivitas akan berasal dari layanan backend setelah
           terintegrasi.

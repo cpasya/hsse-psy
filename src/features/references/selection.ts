@@ -68,7 +68,7 @@ export function referencePatch(
 
         if (!state.ready) {
             throw new Error(
-                `Pilihan ${field.label} belum siap. Muat ulang atau batalkan perubahan referensi.`,
+                `${field.label} options are not ready. Reload or cancel the reference changes.`,
             );
         }
 
@@ -77,7 +77,7 @@ export function referencePatch(
             !state.items.some((item) => item.id === next)
         ) {
             throw new Error(
-                `Pilihan ${field.label} tidak tersedia. Pilih ulang dari daftar terbaru.`,
+                `The selected ${field.label} is unavailable. Select another option from the latest list.`,
             );
         }
 

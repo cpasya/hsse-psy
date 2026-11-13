@@ -8,7 +8,7 @@ export default async function Page() {
   return allowed ? (
     <ModulePlaceholder
       title="Fit to Work"
-      description="Kesiapan kerja harian — data medis memerlukan kebijakan akses khusus."
+      description="Daily work readiness — medical data requires a dedicated access policy."
     />
   ) : (
     <Forbidden />

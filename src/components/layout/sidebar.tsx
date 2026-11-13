@@ -96,7 +96,7 @@ export function Sidebar({ user }: { user: UserDTO }) {
       const response = await fetch("/api/session/logout", { method: "POST" });
 
       if (!response.ok) {
-        toast.warning("Sesi lokal ditutup; pencabutan token server gagal.");
+        toast.warning("Local session closed; server token revocation failed.");
       }
     } finally {
       await signOut({
@@ -110,7 +110,7 @@ export function Sidebar({ user }: { user: UserDTO }) {
       {mobileOpen && (
         <button
           className="drawer-backdrop"
-          aria-label="Tutup navigasi"
+          aria-label="Close navigation"
           onClick={() => setMobile(false)}
         />
       )}
@@ -119,7 +119,7 @@ export function Sidebar({ user }: { user: UserDTO }) {
         id="primary-sidebar"
         ref={asideRef}
         className={cn("sidebar", mobileOpen && "mobile-open")}
-        aria-label="Navigasi utama"
+        aria-label="Primary navigation"
       >
         <div className="sidebar-brand">
           <Link href="/dashboard" className="brand" aria-label="HSSE Dashboard">
@@ -129,13 +129,13 @@ export function Sidebar({ user }: { user: UserDTO }) {
 
             <span className="nav-label">
               <strong>HSSE</strong>
-              <small>Dahboard bikinan pasya ganteng</small>
+              <small>Management Dashboard</small>
             </span>
           </Link>
 
           <button
             className="icon-btn mobile-close"
-            aria-label="Tutup menu"
+            aria-label="Close menu"
             onClick={() => setMobile(false)}
           >
             <X size={18} />
@@ -206,32 +206,32 @@ export function Sidebar({ user }: { user: UserDTO }) {
 
             <span className="nav-label">
               <strong>{user.name}</strong>
-              <small>Akun {user.status}</small>
+              <small>{user.status} account</small>
             </span>
           </div>
 
           <button
             className="nav-item logout"
-            aria-label="Keluar dari akun"
+            aria-label="Sign out"
             onClick={exit}
           >
             <LogOut size={18} />
 
-            <span className="nav-label">Keluar dari akun</span>
+            <span className="nav-label">Sign out</span>
           </button>
 
           <button
             className="collapse-toggle"
             onClick={toggle}
             aria-expanded={!collapsed}
-            aria-label={collapsed ? "Perluas sidebar" : "Ringkas sidebar"}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             {collapsed ? (
               <PanelLeftOpen size={18} />
             ) : (
               <>
                 <PanelLeftClose size={18} />
-                <span>Ringkas navigasi</span>
+                <span>Collapse navigation</span>
               </>
             )}
           </button>

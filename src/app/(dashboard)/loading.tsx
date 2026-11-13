@@ -3,7 +3,7 @@ export default function Loading() {
     <section
       className="card skeleton-wrap"
       role="status"
-      aria-label="Memuat halaman"
+      aria-label="Loading page"
     >
       <div className="skeleton" />
       <div className="skeleton" />

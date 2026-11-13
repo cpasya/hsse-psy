@@ -26,7 +26,7 @@ import {
 import { createJobPositionSchema, type JobPositionRecord } from "../schemas";
 
 const errorMessage = (error: unknown) =>
-  error instanceof Error ? error.message : "Request gagal";
+  error instanceof Error ? error.message : "Request failed";
 
 export function JobPositionsPage() {
   const { data: session, status } = useSession();
@@ -85,7 +85,7 @@ export function JobPositionsPage() {
     },
     onSuccess: async () => {
       setFormOpen(false);
-      toast.success("Job position tersimpan");
+      toast.success("Job position saved");
       await refresh();
     },
     onError: (error) => setFormError(errorMessage(error)),
@@ -94,7 +94,7 @@ export function JobPositionsPage() {
     mutationFn: deleteJobPosition,
     onSuccess: async () => {
       setDeleteTarget(null);
-      toast.success("Job position dihapus");
+      toast.success("Job position deleted");
       await refresh();
     },
     onError: (error) => toast.error(errorMessage(error)),
@@ -115,7 +115,7 @@ export function JobPositionsPage() {
       ? "job-positions.update"
       : "job-positions.create";
     if (!can(user, permission)) {
-      setFormError("Permission aksi tidak tersedia");
+      setFormError("Action permission is unavailable");
       return;
     }
     const parsed = createJobPositionSchema.safeParse({ name });
@@ -128,7 +128,7 @@ export function JobPositionsPage() {
     save.mutate({ id: editing?.id ?? null, value: parsed.data.name });
   }
 
-  if (status === "loading") return <p role="status">Memverifikasi akses…</p>;
+  if (status === "loading") return <p role="status">Verifying access…</p>;
   if (!readable) return <Forbidden />;
 
   const result = query.data;
@@ -138,13 +138,13 @@ export function JobPositionsPage() {
     <>
       <div className="page-heading">
         <div>
-          <p className="eyebrow">ADMINISTRASI</p>
+          <p className="eyebrow">ADMINISTRATION</p>
           <h1>Job Positions</h1>
-          <p className="muted">Master jabatan untuk referensi employee.</p>
+          <p className="muted">Job position master data for employee references.</p>
         </div>
         {can(user, "job-positions.create") && (
           <Button onClick={() => openForm(null)}>
-            <BriefcaseBusiness size={18} /> Tambah job position
+            <BriefcaseBusiness size={18} /> Add job position
           </Button>
         )}
       </div>
@@ -152,19 +152,19 @@ export function JobPositionsPage() {
       <section className="card access-list">
         <div className="filter-bar">
           <div className="field">
-            <label htmlFor="job-position-search">Cari job position</label>
+            <label htmlFor="job-position-search">Search job positions</label>
             <div className="search-control">
               <Search size={18} aria-hidden="true" />
               <input
                 id="job-position-search"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Nama job position"
+                placeholder="Job position name"
               />
             </div>
           </div>
           <div className="field">
-            <label htmlFor="job-position-limit">Per halaman</label>
+            <label htmlFor="job-position-limit">Per page</label>
             <select
               id="job-position-limit"
               value={filters.limit}
@@ -178,7 +178,7 @@ export function JobPositionsPage() {
             >
               {[10, 20, 50, 100].map((limit) => (
                 <option key={limit} value={limit}>
-                  {limit} job position
+                  {limit} job positions
                 </option>
               ))}
             </select>
@@ -187,13 +187,13 @@ export function JobPositionsPage() {
 
         {query.isPending ? (
           <p className="table-state" role="status">
-            Memuat job position…
+            Loading job positions…
           </p>
         ) : query.isError ? (
           <div className="notice error" role="alert">
             <span>{errorMessage(query.error)}</span>
             <Button variant="outline" onClick={() => void query.refetch()}>
-              Coba lagi
+              Try again
             </Button>
           </div>
         ) : result ? (
@@ -202,14 +202,14 @@ export function JobPositionsPage() {
               className="table-scroll"
               tabIndex={0}
               role="region"
-              aria-label="Tabel job position"
+              aria-label="Job positions table"
             >
               <table className="access-table">
                 <thead>
                   <tr>
-                    <th>Nama job position</th>
+                    <th>Job position name</th>
                     <th>ID</th>
-                    <th>Aksi</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -236,7 +236,7 @@ export function JobPositionsPage() {
                               variant="destructive"
                               onClick={() => setDeleteTarget(record)}
                             >
-                              Hapus
+                              Delete
                             </Button>
                           )}
                         </div>
@@ -247,12 +247,12 @@ export function JobPositionsPage() {
               </table>
             </div>
             {!result.data.length && (
-              <p className="table-state">Tidak ada job position yang sesuai.</p>
+              <p className="table-state">No matching job positions found.</p>
             )}
             <div className="pagination">
               <span>
                 {result.total === 0 ? 0 : (result.page - 1) * result.limit + 1}–
-                {Math.min(result.page * result.limit, result.total)} dari{" "}
+                {Math.min(result.page * result.limit, result.total)} of{" "}
                 {result.total}
               </span>
               <div className="pagination-controls">
@@ -266,7 +266,7 @@ export function JobPositionsPage() {
                     }))
                   }
                 >
-                  Sebelumnya
+                  Previous
                 </Button>
                 <Button
                   variant="outline"
@@ -278,7 +278,7 @@ export function JobPositionsPage() {
                     }))
                   }
                 >
-                  Berikutnya
+                  Next
                 </Button>
               </div>
             </div>
@@ -294,14 +294,14 @@ export function JobPositionsPage() {
       >
         <DialogContent>
           <DialogTitle asChild>
-            <h2>{editing ? "Edit job position" : "Tambah job position"}</h2>
+            <h2>{editing ? "Edit job position" : "Add job position"}</h2>
           </DialogTitle>
           <DialogDescription>
-            Nama jabatan yang dapat dipilih pada employee.
+            Job position name available for employee selection.
           </DialogDescription>
           <form className="dialog-form" onSubmit={submit}>
             <div className="field">
-              <label htmlFor="job-position-name">Nama job position</label>
+              <label htmlFor="job-position-name">Job position name</label>
               <input
                 id="job-position-name"
                 value={name}
@@ -323,10 +323,10 @@ export function JobPositionsPage() {
                 disabled={save.isPending}
                 onClick={() => setFormOpen(false)}
               >
-                Batal
+                Cancel
               </Button>
               <Button disabled={save.isPending}>
-                {save.isPending ? "Menyimpan…" : "Simpan"}
+                {save.isPending ? "Saving…" : "Save"}
               </Button>
             </div>
           </form>
@@ -338,8 +338,8 @@ export function JobPositionsPage() {
         onOpenChange={(open) => {
           if (!open && !remove.isPending) setDeleteTarget(null);
         }}
-        title="Hapus job position?"
-        description={`${deleteTarget?.name ?? "Job position"} akan dihapus. Backend akan menolak jika record masih digunakan.`}
+        title="Delete job position?"
+        description={`${deleteTarget?.name ?? "Job position"} will be deleted. The backend will reject the request if the record is still in use.`}
         pending={remove.isPending}
         onConfirm={() => {
           if (deleteTarget && can(user, "job-positions.delete"))

@@ -32,13 +32,13 @@ async function request<T>(
   try {
     json = await res.json();
   } catch {
-    throw new ApiError(res.status, ["Respons server tidak valid"]);
+    throw new ApiError(res.status, ["Invalid server response"]);
   }
   if (!res.ok) {
     const message =
       typeof json === "object" && json !== null && "message" in json
         ? json.message
-        : "Request gagal";
+        : "Request failed";
     throw new ApiError(
       res.status,
       Array.isArray(message) ? message.map(String) : [String(message)],

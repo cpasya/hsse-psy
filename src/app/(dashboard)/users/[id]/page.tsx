@@ -7,7 +7,7 @@ import { UserDetailPage } from "@/features/users/components/user-detail-page";
 import { requirePermission } from "@/lib/guards";
 
 export const metadata = {
-  title: "Detail User",
+  title: "User Details",
 };
 
 async function AuthorizedDetail({ employeeId }: { employeeId: string }) {
@@ -37,7 +37,7 @@ export default async function Page({
         <section
           className="card skeleton-wrap"
           role="status"
-          aria-label="Memverifikasi akses detail user"
+          aria-label="Verifying user detail access"
         >
           <div className="skeleton" />
           <div className="skeleton" />

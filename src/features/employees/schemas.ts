@@ -3,11 +3,11 @@ export const employeeStatusSchema = z.enum(["active", "disabled"]);
 export const MAX_EMPLOYEE_IMAGE_BYTES = 2 * 1024 * 1024;
 export const employeeImageSchema = z
   .file()
-  .max(MAX_EMPLOYEE_IMAGE_BYTES, "Ukuran foto maksimal 2 MB")
-  .mime(["image/jpeg", "image/png"], "Foto harus berupa JPEG atau PNG");
+  .max(MAX_EMPLOYEE_IMAGE_BYTES, "The profile photo must be 2 MB or smaller")
+  .mime(["image/jpeg", "image/png"], "The profile photo must be a JPEG or PNG");
 const nullableUuid = z.string().uuid().nullable().optional();
 const mutableFields = {
-  name: z.string().trim().min(1, "Nama wajib diisi"),
+  name: z.string().trim().min(1, "Name is required"),
   employeeNumber: z.string().trim().nullable().optional(),
   phone: z.string().trim().nullable().optional(),
   departmentId: nullableUuid,
@@ -20,9 +20,9 @@ export const createEmployeeSchema = z
     name: mutableFields.name,
     employeeNumber: mutableFields.employeeNumber,
     phone: mutableFields.phone,
-    departmentId: z.string().uuid("Department wajib dipilih"),
-    jobPositionId: z.string().uuid("Job Position ID wajib berupa UUID"),
-    email: z.string().trim().email("Email tidak valid"),
+    departmentId: z.string().uuid("Department is required"),
+    jobPositionId: z.string().uuid("Job Position ID must be a UUID"),
+    email: z.string().trim().email("Invalid email address"),
     image: mutableFields.image,
   })
   .strict();
@@ -30,7 +30,7 @@ export const updateEmployeeSchema = z
   .object(mutableFields)
   .partial()
   .strict()
-  .refine((v) => Object.keys(v).length > 0, "Tidak ada perubahan yang dikirim");
+  .refine((v) => Object.keys(v).length > 0, "No changes were submitted");
 export const backendEmployeeSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -59,7 +59,7 @@ export const employeePermissionSchema = z.object({
 export const employeeDetailSchema = backendEmployeeSchema.extend({
   permissions: z.array(employeePermissionSchema).refine(
     (items) => new Set(items.map((item) => item.id)).size === items.length,
-    "Detail employee berisi permission duplikat",
+    "Employee details contain duplicate permissions",
   ),
 });
 
@@ -67,7 +67,7 @@ export const assignRolePermissionsSchema = z
   .object({
     permissionIds: z.array(z.string().uuid()).refine(
       (items) => new Set(items).size === items.length,
-      "Permission duplikat",
+      "Duplicate permissions",
     ),
   })
   .strict();

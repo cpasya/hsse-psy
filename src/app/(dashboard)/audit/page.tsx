@@ -8,7 +8,7 @@ export default async function Page() {
   return allowed ? (
     <ModulePlaceholder
       title="HSSE Audit"
-      description="Audit keselamatan dan tindak lanjut temuan."
+      description="Safety audits and findings follow-up."
     />
   ) : (
     <Forbidden />

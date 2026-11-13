@@ -7,10 +7,10 @@ export default function ErrorPage({
 }) {
   return (
     <main className="boot">
-      <h1>Terjadi kendala</h1>
-      <p>Halaman belum dapat ditampilkan. Data form tidak dikirim otomatis.</p>
+      <h1>Something went wrong</h1>
+      <p>The page cannot be displayed yet. Form data was not submitted automatically.</p>
       <button className="btn btn-outline" onClick={reset}>
-        Coba lagi
+        Try again
       </button>
     </main>
   );

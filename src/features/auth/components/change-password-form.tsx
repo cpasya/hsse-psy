@@ -56,7 +56,7 @@ export function ChangePasswordForm() {
             result !== null &&
             "message" in result
             ? String(result.message)
-            : "Password gagal diubah",
+            : "Password could not be changed",
         );
       }
 
@@ -66,7 +66,7 @@ export function ChangePasswordForm() {
       setError(
         caught instanceof Error
           ? caught.message
-          : "Server tidak dapat dihubungi",
+          : "The server could not be reached",
       );
     }
   }
@@ -79,7 +79,7 @@ export function ChangePasswordForm() {
     >
       <div className="field">
         <label htmlFor="new-password">
-          Password baru
+          New password
         </label>
         <div className="input-icon">
           <input
@@ -96,8 +96,8 @@ export function ChangePasswordForm() {
             disabled={isSubmitting}
             aria-label={
               show
-                ? "Sembunyikan password"
-                : "Tampilkan password"
+                ? "Hide password"
+                : "Show password"
             }
             onClick={() => setShow(!show)}
           >
@@ -117,7 +117,7 @@ export function ChangePasswordForm() {
 
       <div className="field">
         <label htmlFor="confirm-password">
-          Konfirmasi password baru
+          Confirm new password
         </label>
         <input
           id="confirm-password"
@@ -135,10 +135,10 @@ export function ChangePasswordForm() {
       </div>
 
       <ul className="muted">
-        <li>Minimal 12 karakter</li>
-        <li>Minimal satu huruf kapital</li>
-        <li>Minimal satu angka</li>
-        <li>Minimal satu simbol</li>
+        <li>At least 12 characters</li>
+        <li>At least one uppercase letter</li>
+        <li>At least one number</li>
+        <li>At least one symbol</li>
       </ul>
 
       {error && (
@@ -153,8 +153,8 @@ export function ChangePasswordForm() {
           <Loader2 size={18} className="spin" />
         ) : null}
         {isSubmitting
-          ? "Mengubah password…"
-          : "Simpan password baru"}
+          ? "Changing password…"
+          : "Save new password"}
       </Button>
     </form>
   );

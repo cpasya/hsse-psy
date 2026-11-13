@@ -36,13 +36,13 @@ export function ReferenceSelect({
         !items.some((item) => item.id === value);
 
     const hint = !allowed
-        ? "Tidak memiliki izin membaca referensi ini. Nilai existing tidak diubah."
+        ? "You do not have permission to read this reference. The existing value will not be changed."
         : pending
-            ? "Memuat seluruh halaman referensi…"
+            ? "Loading all reference pages…"
             : error
                 ? error
                 : !items.length
-                    ? "Belum ada referensi yang dapat dipilih."
+                    ? "No references are available for selection."
                     : "";
 
     return (
@@ -58,11 +58,11 @@ export function ReferenceSelect({
                 required={required}
                 onChange={(event) => onChange(event.target.value)}
             >
-                <option value="">Belum ditetapkan</option>
+                <option value="">Not assigned</option>
 
                 {unresolved && (
                     <option value={value}>
-                        Referensi belum termuat · {value}
+                        Reference not loaded · {value}
                     </option>
                 )}
 
@@ -82,7 +82,7 @@ export function ReferenceSelect({
 
             {unresolved && (
                 <small>
-                    UUID pilihan: {value}. Tidak otomatis dikosongkan.
+                    Selected UUID: {value}. It will not be cleared automatically.
                 </small>
             )}
 
@@ -92,7 +92,7 @@ export function ReferenceSelect({
                     variant="outline"
                     onClick={onRetry}
                 >
-                    Muat ulang {label}
+                    Reload {label}
                 </Button>
             )}
         </div>

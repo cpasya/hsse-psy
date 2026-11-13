@@ -8,7 +8,7 @@ export default async function Page() {
   return allowed ? (
     <ModulePlaceholder
       title="Risk Management"
-      description="Register HIRADC dan pengendalian risiko."
+      description="HIRADC register and risk controls."
     />
   ) : (
     <Forbidden />

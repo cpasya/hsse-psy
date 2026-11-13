@@ -26,7 +26,7 @@ import type { UserDTO } from "@/features/users/types";
 import { can } from "@/lib/rbac";
 
 const errorMessage = (error: unknown) =>
-  error instanceof Error ? error.message : "Request gagal";
+  error instanceof Error ? error.message : "Request failed";
 
 export function UserDetailPage({
   employeeId,
@@ -55,7 +55,7 @@ export function UserDetailPage({
   });
 
   if (employee.isPending) {
-    return <p role="status">Memuat detail user…</p>;
+    return <p role="status">Loading user details…</p>;
   }
 
   if (employee.isError) {
@@ -63,7 +63,7 @@ export function UserDetailPage({
       <div className="notice error" role="alert">
         <p>{errorMessage(employee.error)}</p>
         <Button variant="outline" onClick={() => void employee.refetch()}>
-          Coba lagi
+          Try again
         </Button>
       </div>
     );
@@ -75,13 +75,13 @@ export function UserDetailPage({
         <div>
           <p className="eyebrow">MASTER USER</p>
           <h1>{employee.data.name}</h1>
-          <p className="muted">Detail profil dan hak akses langsung user.</p>
+          <p className="muted">User profile details and direct permissions.</p>
         </div>
 
         <Button asChild variant="outline">
           <Link href="/users">
             <ArrowLeft size={18} />
-            Kembali
+            Back
           </Link>
         </Button>
       </div>
@@ -111,8 +111,8 @@ function ProfileCard({ employee }: { employee: EmployeeDetail }) {
     <section className="card" aria-labelledby="profile-title">
       <div className="section-heading compact-heading">
         <div>
-          <h2 id="profile-title">Profil employee</h2>
-          <p className="muted">Data identitas dari backend.</p>
+          <h2 id="profile-title">Employee profile</h2>
+          <p className="muted">Identity data from the backend.</p>
         </div>
         <StatusBadge status={employee.status} />
       </div>
@@ -120,9 +120,9 @@ function ProfileCard({ employee }: { employee: EmployeeDetail }) {
       <dl className="detail-dl">
         <dt>Email</dt>
         <dd>{employee.email}</dd>
-        <dt>Nomor karyawan</dt>
+        <dt>Employee number</dt>
         <dd>{employee.employeeNumber ?? "—"}</dd>
-        <dt>Telepon</dt>
+        <dt>Phone</dt>
         <dd>{employee.phone ?? "—"}</dd>
         <dt>Department ID</dt>
         <dd>{employee.departmentId ?? "—"}</dd>
@@ -221,14 +221,14 @@ function AccessCard({
         employeePermissionFingerprint(employee)
       ) {
         throw new Error(
-          "Hak akses berubah sejak halaman dibuka. Muat ulang sebelum menyimpan.",
+          "Permissions changed after this page was opened. Reload before saving.",
         );
       }
 
       await replaceEmployeePermissions(employee.id, selected);
       await client.invalidateQueries({ queryKey: ["employees"] });
       await onSaved();
-      toast.success("Hak akses user tersimpan");
+      toast.success("User permissions saved");
     } catch (caught) {
       const message = errorMessage(caught);
       setError(message);
@@ -243,9 +243,9 @@ function AccessCard({
     <section className="card" aria-labelledby="access-title">
       <div className="section-heading compact-heading">
         <div>
-          <h2 id="access-title">Hak akses</h2>
+          <h2 id="access-title">Permissions</h2>
           <p className="muted">
-            {original.length} permission terpasang pada user ini.
+            {original.length} permissions assigned to this user.
           </p>
         </div>
         <ShieldCheck size={22} aria-hidden="true" />
@@ -267,24 +267,24 @@ function AccessCard({
         </>
       ) : catalogueLoading ? (
         <p className="access-note" role="status">
-          Memuat katalog permission lengkap…
+          Loading the complete permission catalogue…
         </p>
       ) : catalogueError ? (
         <div className="notice error" role="alert">
           <p>{errorMessage(catalogueError)}</p>
           <Button variant="outline" onClick={onRetryCatalogue}>
-            Coba lagi
+            Try again
           </Button>
         </div>
       ) : (
         <>
           <div className="field access-search">
-            <label htmlFor="employee-permission-search">Cari permission</label>
+            <label htmlFor="employee-permission-search">Search permissions</label>
             <input
               id="employee-permission-search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Contoh: employees.read"
+              placeholder="Example: employees.read"
             />
           </div>
 
@@ -300,7 +300,7 @@ function AccessCard({
                       <span>
                         <strong>{permission.action}</strong>
                         <small>
-                          {permission.isActive ? "Aktif" : "Nonaktif"}
+                          {permission.isActive ? "Active" : "Inactive"}
                         </small>
                       </span>
                       <input
@@ -320,14 +320,14 @@ function AccessCard({
 
             {!!unknown.length && (
               <fieldset className="permission-group">
-                <legend>Tidak ada di katalog</legend>
+                <legend>Not in catalogue</legend>
                 {unknown.map((permission) => (
                   <label className="permission-switch" key={permission.id}>
                     <span>
                       <strong>
                         {permission.resource}.{permission.action}
                       </strong>
-                      <small>Dipertahankan kecuali dilepas eksplisit</small>
+                      <small>Preserved unless explicitly removed</small>
                     </span>
                     <input
                       type="checkbox"
@@ -343,7 +343,7 @@ function AccessCard({
             )}
 
             {!groups.length && !unknown.length && (
-              <p className="muted">Tidak ada permission yang sesuai.</p>
+              <p className="muted">No matching permissions found.</p>
             )}
           </div>
 
@@ -358,13 +358,13 @@ function AccessCard({
               disabled={!changed || saving}
               onClick={() => setSelected(original)}
             >
-              Batalkan perubahan
+              Discard changes
             </Button>
             <Button
               disabled={!changed || saving}
               onClick={() => setConfirm(true)}
             >
-              Simpan hak akses
+              Save permissions
             </Button>
           </div>
         </>
@@ -373,8 +373,8 @@ function AccessCard({
       <ConfirmDialog
         open={confirm}
         onOpenChange={(open) => !saving && setConfirm(open)}
-        title="Ganti seluruh hak akses user?"
-        description={`${employee.name}: ${original.length} permission menjadi ${selected.length}. Perubahan ini langsung memengaruhi akses user.`}
+        title="Replace all user permissions?"
+        description={`${employee.name}: ${original.length} permissions will become ${selected.length}. This change immediately affects user access.`}
         pending={saving}
         onConfirm={() => void save()}
       />
@@ -384,7 +384,7 @@ function AccessCard({
 
 function ExistingPermissions({ employee }: { employee: EmployeeDetail }) {
   if (!employee.permissions.length) {
-    return <p className="muted access-note">Belum ada permission.</p>;
+    return <p className="muted access-note">No permissions assigned.</p>;
   }
 
   return (
@@ -392,7 +392,7 @@ function ExistingPermissions({ employee }: { employee: EmployeeDetail }) {
       {employee.permissions.map((permission) => (
         <li key={permission.id}>
           {permission.resource}.{permission.action}
-          {!permission.isActive ? " — nonaktif" : ""}
+          {!permission.isActive ? " — inactive" : ""}
         </li>
       ))}
     </ul>

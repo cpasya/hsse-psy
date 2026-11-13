@@ -118,7 +118,7 @@ function message(input: unknown) {
     }
   }
 
-  return "Request ditolak oleh backend";
+  return "Request rejected by the backend";
 }
 
 async function handler(
@@ -130,7 +130,7 @@ async function handler(
 
   if (!allowed(pathParts, req.method)) {
     return fail(
-      "Endpoint atau method belum didukung gateway",
+      "The endpoint or method is not supported by the gateway",
       404,
     );
   }
@@ -142,7 +142,7 @@ async function handler(
     req.headers.get("origin") !==
     new URL(env.NEXTAUTH_URL).origin
   ) {
-    return fail("Origin ditolak", 403);
+    return fail("Origin rejected", 403);
   }
 
   const sessionStartedAt = performance.now();
@@ -152,7 +152,7 @@ async function handler(
   });
 
   if (!raw) {
-    return fail("Silakan login kembali", 401);
+    return fail("Please sign in again", 401);
   }
 
   let token = await loadEffectiveToken(raw);
@@ -170,8 +170,8 @@ async function handler(
   function sessionFailure() {
     return fail(
       token.error === "ProfileUnavailable"
-        ? "Profil akses belum dapat diverifikasi"
-        : "Sesi tidak aktif",
+        ? "The access profile could not be verified"
+        : "Session is inactive",
       token.error === "ProfileUnavailable"
         ? 503
         : token.error === "AccountInactive"
@@ -183,7 +183,7 @@ async function handler(
   if (token.error) return sessionFailure();
 
   if (!token.profile.isActive) {
-    return fail("Akun tidak aktif", 403);
+    return fail("Account is inactive", 403);
   }
 
   const [resource, id] = pathParts;
@@ -208,7 +208,7 @@ async function handler(
       permission &&
       !can(token.profile, permission)
     ) {
-      return fail("Permission tidak mencukupi", 403);
+      return fail("Insufficient permissions", 403);
     }
 
     if (
@@ -217,7 +217,7 @@ async function handler(
       req.method !== "GET"
     ) {
       return fail(
-        "Pengaman aplikasi: role akun sendiri tidak boleh diubah/dihapus",
+        "Application safeguard: you cannot change or delete your own role",
         403,
       );
     }
@@ -235,8 +235,8 @@ async function handler(
     ) {
       return fail(
         req.method === "DELETE"
-          ? "Tidak dapat menonaktifkan akun sendiri"
-          : "Tidak dapat mengubah hak akses akun sendiri",
+          ? "You cannot disable your own account"
+          : "You cannot change your own permissions",
         403,
       );
     }
@@ -260,7 +260,7 @@ async function handler(
       employeeMultipart &&
       !req.headers.get("content-type")?.startsWith("multipart/form-data")
     ) {
-      return fail("Employee harus dikirim sebagai multipart/form-data", 415);
+      return fail("Employee data must be sent as multipart/form-data", 415);
     }
 
     try {
@@ -310,7 +310,7 @@ async function handler(
         const keys = [...new Set(form.keys())];
 
         if (keys.some((key) => form!.getAll(key).length !== 1)) {
-          return fail("Field employee tidak boleh dikirim berulang", 422);
+          return fail("Employee fields cannot be sent more than once", 422);
         }
 
         const encoder = new TextEncoder();
@@ -352,7 +352,7 @@ async function handler(
         parsed.status === "disabled"
       ) {
         return fail(
-          "Tidak dapat menonaktifkan akun sendiri",
+          "You cannot disable your own account",
           403,
         );
       }
@@ -392,8 +392,8 @@ async function handler(
             .map((issue) => issue.message)
             .join(", ")
           : employeeMultipart
-            ? "Payload multipart tidak valid"
-            : "Payload JSON tidak valid",
+            ? "Invalid multipart payload"
+            : "Invalid JSON payload",
         422,
       );
     }
@@ -415,7 +415,7 @@ async function handler(
     if (
       !["active", "disabled"].includes(status)
     ) {
-      return fail("Filter status tidak valid", 422);
+      return fail("Invalid status filter", 422);
     }
 
     query.set("status", status);
@@ -475,7 +475,7 @@ async function handler(
         requestedEmployeeStatus === "disabled"
       ) {
         return fail(
-          "Tidak dapat menonaktifkan akun sendiri",
+          "You cannot disable your own account",
           403,
         );
       }
@@ -491,7 +491,7 @@ async function handler(
         json = JSON.parse(text);
       } catch {
         return fail(
-          "Respons backend bukan JSON yang valid",
+          "The backend response is not valid JSON",
           502,
           timingHeaders(),
         );
@@ -521,7 +521,7 @@ async function handler(
     );
   } catch {
     return fail(
-      "Backend tidak dapat dihubungi",
+      "The backend could not be reached",
       502,
       timingHeaders(),
     );

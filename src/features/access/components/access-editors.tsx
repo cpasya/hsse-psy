@@ -26,7 +26,7 @@ import {
 import { PermissionPicker } from "./permission-picker";
 
 export const errorMessage = (error: unknown) =>
-    error instanceof Error ? error.message : "Request gagal";
+    error instanceof Error ? error.message : "Request failed";
 
 export type RoleMode = "new" | "view" | "edit" | "assign";
 
@@ -96,10 +96,10 @@ export function RoleEditor(
             <div className="page-heading">
                 <h2>
                     {props.mode === "new"
-                        ? "Tambah role"
+                        ? "Add role"
                         : props.mode === "assign"
-                            ? "Atur permission role"
-                            : "Detail / edit role"}
+                            ? "Manage role permissions"
+                            : "Role details / edit"}
                 </h2>
 
                 {(props.mode === "view" || props.mode === "assign") && (
@@ -107,15 +107,15 @@ export function RoleEditor(
                         variant="outline"
                         onClick={props.onClose}
                     >
-                        Tutup
+                        Close
                     </Button>
                 )}
             </div>
 
             {needsCatalogue && !readable ? (
                 <p role="alert">
-                    Diperlukan permissions.read untuk memuat
-                    katalog lengkap.
+                    permissions.read is required to load the complete
+                    catalogue.
                 </p>
             ) : failed ? (
                 <div className="notice error" role="alert">
@@ -130,12 +130,12 @@ export function RoleEditor(
                             if (needsCatalogue) void catalogue.refetch();
                         }}
                     >
-                        Coba lagi
+                        Try again
                     </Button>
                 </div>
             ) : loading ? (
                 <p role="status">
-                    Memuat detail dan katalog lengkap…
+                    Loading details and the complete catalogue…
                 </p>
             ) : (
                 <RoleForm
@@ -201,7 +201,7 @@ function RoleForm({
 
         if (!writable) {
             setError(
-                "Role sistem / role sendiri read-only, atau izin tidak tersedia.",
+                "System roles and your own role are read-only, or permission is unavailable.",
             );
             return;
         }
@@ -227,7 +227,7 @@ function RoleForm({
                     current.isSystem ||
                     current.id === user.roleId
                 ) {
-                    throw new Error("Role ini dilindungi");
+                    throw new Error("This role is protected");
                 }
 
                 if (
@@ -235,7 +235,7 @@ function RoleForm({
                     assignmentFingerprint(initial!)
                 ) {
                     throw new Error(
-                        "Role berubah sejak dibuka. Tutup dan buka ulang sebelum menyimpan.",
+                        "The role changed after it was opened. Close and reopen it before saving.",
                     );
                 }
 
@@ -293,9 +293,8 @@ function RoleForm({
         >
             {protectedRole && (
                 <div className="notice">
-                    Pengaman UI: role sistem dan role akun sendiri
-                    hanya bisa dilihat. Backend tetap wajib
-                    memeriksa otorisasi.
+                    UI safeguard: system roles and your own role are
+                    read-only. The backend must still enforce authorization.
                 </div>
             )}
 
@@ -313,7 +312,7 @@ function RoleForm({
             >
                 <div className="field">
                     <label htmlFor="role-name">
-                        Nama role
+                        Role name
                     </label>
 
                     <input
@@ -326,7 +325,7 @@ function RoleForm({
 
                 <div className="field">
                     <label htmlFor="role-description">
-                        Deskripsi
+                        Description
                     </label>
 
                     <input
@@ -350,31 +349,31 @@ function RoleForm({
 
                     {mode === "assign" && (
                         <p className="muted">
-                            PUT mengganti seluruh assignment.{" "}
+                            PUT replaces the entire assignment.{" "}
                             {original.length} existing →{" "}
-                            {selected.length} dipilih.
-                            Daftar kosong akan melepas semuanya.
+                            {selected.length} selected.
+                            An empty list removes all assignments.
                         </p>
                     )}
                 </>
             ) : (
                 <div>
                     <h3>
-                        Permission existing ({original.length})
+                        Existing permissions ({original.length})
                     </h3>
 
                     <ul className="access-existing">
                         {initial?.permissions.map((p) => (
                             <li key={p.id}>
                                 {p.resource}.{p.action}
-                                {!p.isActive ? " — nonaktif" : ""}
+                                {!p.isActive ? " — inactive" : ""}
                             </li>
                         ))}
                     </ul>
 
                     {!original.length && (
                         <p className="muted">
-                            Belum ada assignment.
+                            No assignments yet.
                         </p>
                     )}
                 </div>
@@ -387,7 +386,7 @@ function RoleForm({
                     disabled={busy}
                     onClick={onClose}
                 >
-                    Batal / tutup
+                    Cancel / close
                 </Button>
 
                 {mode !== "view" && (
@@ -399,7 +398,7 @@ function RoleForm({
                             (mode === "assign" && !changed)
                         }
                     >
-                        {busy ? "Menyimpan…" : "Simpan"}
+                        {busy ? "Saving…" : "Save"}
                     </Button>
                 )}
             </div>
@@ -409,12 +408,12 @@ function RoleForm({
                 onOpenChange={(value) => {
                     if (!busy) setConfirm(value);
                 }}
-                title="Ganti seluruh permission role?"
+                title="Replace all role permissions?"
                 description={
                     `Assignment ${name}: ${original.length} existing ` +
-                    `menjadi ${selected.length} dipilih. ` +
-                    "Pengguna role ini dapat kehilangan akses. " +
-                    "Tidak ada penambahan otomatis."
+                    `will become ${selected.length} selected. ` +
+                    "Users with this role may lose access. " +
+                    "No permissions are added automatically."
                 }
                 pending={busy}
                 onConfirm={() => void save(true)}
@@ -465,7 +464,7 @@ export function PermissionEditor({
 
         if (!writable) {
             setError(
-                "Permission sistem read-only atau izin tidak tersedia",
+                "System permissions are read-only or permission is unavailable",
             );
             return;
         }
@@ -515,12 +514,12 @@ export function PermissionEditor({
     return (
         <section className="access-editor">
             <h2>
-                {record ? "Edit permission" : "Tambah permission"}
+                {record ? "Edit permission" : "Add permission"}
             </h2>
 
             <p className="muted">
-                Inget bro : Membuat permission ini engga otomatis ngebuat
-                fitur baru atau ngasih izin ke role.
+                Creating a permission does not automatically create a new
+                feature or grant it to a role.
             </p>
 
             <form
@@ -569,7 +568,7 @@ export function PermissionEditor({
 
                     <div className="field">
                         <label htmlFor="permission-description">
-                            Deskripsi
+                            Description
                         </label>
 
                         <input
@@ -589,7 +588,7 @@ export function PermissionEditor({
                                 setActive(e.target.checked)
                             }
                         />
-                        Aktif
+                        Active
                     </label>
                 </fieldset>
 
@@ -600,11 +599,11 @@ export function PermissionEditor({
                         disabled={busy}
                         onClick={onClose}
                     >
-                        Batal
+                        Cancel
                     </Button>
 
                     <Button disabled={busy || !writable}>
-                        {busy ? "Menyimpan…" : "Simpan"}
+                        {busy ? "Saving…" : "Save"}
                     </Button>
                 </div>
             </form>

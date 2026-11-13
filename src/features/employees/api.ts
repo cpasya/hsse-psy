@@ -116,7 +116,7 @@ export async function getEmployee(
 
   if (!result.success) {
     throw new Error(
-      "Format detail employee berbeda dari kontrak",
+      "Employee details do not match the expected format",
     );
   }
 
@@ -182,7 +182,7 @@ export async function assignRolePermissions(
         "message" in result
       )
         ? String(result.message)
-        : "Gagal memperbarui permission role",
+        : "Failed to update role permissions",
     );
   }
 
