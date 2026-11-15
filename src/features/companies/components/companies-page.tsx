@@ -91,7 +91,11 @@ export function CompaniesPage() {
       toast.success("Company saved");
       await client.invalidateQueries({ queryKey: ["companies"] });
     },
-    onError: (error) => setFormError(errorMessage(error)),
+    onError: (error) => {
+      const message = errorMessage(error);
+      setFormError(message);
+      toast.error(message);
+    },
   });
   const remove = useMutation({
     mutationFn: deleteCompany,
@@ -157,7 +161,7 @@ export function CompaniesPage() {
         <div>
           <p className="eyebrow">ADMINISTRATION</p>
           <h1>Companies</h1>
-          <p className="muted">Company master data from the HSSE backend.</p>
+          <p className="muted">Company master data from the SHIELD backend.</p>
         </div>
         {can(user, "companies.create") && (
           <Button onClick={() => openForm(null)}>

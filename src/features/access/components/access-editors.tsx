@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -274,7 +275,9 @@ function RoleForm({
 
             await onSaved();
         } catch (e) {
-            setError(errorMessage(e));
+            const message = errorMessage(e);
+            setError(message);
+            toast.error(message);
         } finally {
             setBusy(false);
             setConfirm(false);
@@ -505,7 +508,9 @@ export function PermissionEditor({
 
             await onSaved();
         } catch (e) {
-            setError(errorMessage(e));
+            const message = errorMessage(e);
+            setError(message);
+            toast.error(message);
         } finally {
             setBusy(false);
         }

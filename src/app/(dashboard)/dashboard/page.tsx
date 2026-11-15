@@ -3,7 +3,7 @@ import { requireSession } from "@/lib/guards";
 import { Dashboard } from "@/features/dashboard/components/dashboard";
 
 export const metadata = {
-  title: "Dashboard HSSE",
+  title: "Dashboard SHIELD",
 };
 
 export default async function Page() {

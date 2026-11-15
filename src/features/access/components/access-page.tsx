@@ -299,7 +299,7 @@ function AccessContent({
                     <h1>{title}</h1>
 
                     <p className="muted">
-                        Data and authorization are provided by the HSSE backend.
+                        Data and authorization are provided by the SHIELD backend.
                     </p>
                 </div>
 

@@ -677,7 +677,7 @@ export function UsersPage(
               >
                 <table className="employee-table">
                   <caption className="sr-only">
-                    Employee list from the HSSE backend
+                    Employee list from the SHIELD backend
                   </caption>
 
                   <thead>

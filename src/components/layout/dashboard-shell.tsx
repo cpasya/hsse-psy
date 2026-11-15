@@ -77,9 +77,9 @@ export function DashboardShell({
         </main>
 
         <footer className="app-footer">
-          <span>HSSE · Management Dashboard</span>
+          <span>SHIELD · Management Dashboard</span>
 
-          <span>Safety is a shared responsibility.</span>
+          <span>Safety First is Safety Always.</span>
         </footer>
       </div>
     </div>

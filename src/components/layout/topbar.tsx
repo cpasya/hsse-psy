@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
 import {
@@ -11,6 +11,7 @@ import {
   ChevronDown,
   RefreshCw,
   LogOut,
+  Loader2,
   UserRound,
 } from "lucide-react";
 
@@ -25,6 +26,7 @@ import {
 } from "@/components/ui/dialog";
 
 import type { UserDTO } from "@/features/users/types";
+import { useLogout } from "@/features/auth/use-logout";
 
 import { useUIStore } from "@/store/ui-store";
 import { initials } from "@/lib/utils";
@@ -34,6 +36,7 @@ import { ThemeToggle } from "./theme-toggle";
 export function Topbar({ user }: { user: UserDTO }) {
   const path = usePathname();
   const { update } = useSession();
+  const { isLoggingOut, logout } = useLogout();
 
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState(false);
@@ -67,18 +70,6 @@ export function Topbar({ user }: { user: UserDTO }) {
     }
   }
 
-  async function exit() {
-    try {
-      const response = await fetch("/api/session/logout", { method: "POST" });
-
-      if (!response.ok) {
-        toast.warning("Local session closed; server token revocation failed.");
-      }
-    } finally {
-      await signOut({ callbackUrl: "/login" });
-    }
-  }
-
   return (
     <header className="topbar">
       <div className="topbar-context">
@@ -92,16 +83,13 @@ export function Topbar({ user }: { user: UserDTO }) {
           <Menu size={21} />
         </button>
 
-        <span>Workspace</span>
-        <span className="separator">/</span>
-
         <strong>
-          {path === "/profile" ? "Profile" : current?.label || "HSSE"}
+          {path === "/profile" ? "Profile" : current?.label || "SHIELD"}
         </strong>
       </div>
 
       <div className="topbar-tools">
-        <ThemeToggle />
+        {/* <ThemeToggle /> */}
 
         <button
           className="icon-btn"
@@ -112,13 +100,13 @@ export function Topbar({ user }: { user: UserDTO }) {
           <RefreshCw size={19} className={busy ? "spin" : ""} />
         </button>
 
-        <button
+        {/* <button
           className="icon-btn"
           aria-label="Notifications"
           onClick={() => setNotice(true)}
         >
           <Bell size={20} />
-        </button>
+        </button> */}
 
         <DropdownMenu.Root>
           <DropdownMenu.Trigger asChild>
@@ -160,10 +148,15 @@ export function Topbar({ user }: { user: UserDTO }) {
 
               <DropdownMenu.Item
                 className="profile-menu-item danger"
-                onSelect={() => void exit()}
+                disabled={isLoggingOut}
+                onSelect={() => void logout()}
               >
-                <LogOut size={18} />
-                Logout
+                {isLoggingOut ? (
+                  <Loader2 size={18} className="spin" />
+                ) : (
+                  <LogOut size={18} />
+                )}
+                {isLoggingOut ? "Signing out…" : "Logout"}
               </DropdownMenu.Item>
             </DropdownMenu.Content>
           </DropdownMenu.Portal>

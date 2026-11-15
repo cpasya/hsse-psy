@@ -88,7 +88,11 @@ export function JobPositionsPage() {
       toast.success("Job position saved");
       await refresh();
     },
-    onError: (error) => setFormError(errorMessage(error)),
+    onError: (error) => {
+      const message = errorMessage(error);
+      setFormError(message);
+      toast.error(message);
+    },
   });
   const remove = useMutation({
     mutationFn: deleteJobPosition,

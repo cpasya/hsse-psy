@@ -164,11 +164,40 @@ test("Navigation, routes, gateway, and employee picker use exact permissions", (
   assert.ok(!topbar.includes("Role ID"));
   assert.ok(topbar.includes("Account Settings"));
   assert.ok(topbar.includes('href="/profile"'));
-  assert.ok(topbar.includes('fetch("/api/session/logout"'));
+  assert.ok(topbar.includes("useLogout"));
   assert.ok(profile.includes("getDepartment"));
   assert.ok(profile.includes("getJobPosition"));
   assert.ok(profile.includes("getCompany"));
   assert.ok(profile.includes("Effective permissions table"));
-  assert.ok(profile.includes("ChangePasswordForm"));
+  assert.ok(!profile.includes("ChangePasswordForm"));
+  assert.ok(profile.includes("Regular password changes are not available yet."));
   assert.ok(profileRoute.includes("requireSession()"));
+});
+
+test("Sign out shows processing and final session feedback", () => {
+  const logout = readFileSync(
+    "src/features/auth/use-logout.ts",
+    "utf8",
+  );
+  const sidebar = readFileSync("src/components/layout/sidebar.tsx", "utf8");
+  const topbar = readFileSync("src/components/layout/topbar.tsx", "utf8");
+  const login = readFileSync(
+    "src/features/auth/components/login-form.tsx",
+    "utf8",
+  );
+  const authToast = readFileSync(
+    "src/features/auth/components/auth-toast.tsx",
+    "utf8",
+  );
+
+  assert.ok(logout.includes('fetch("/api/session/logout"'));
+  assert.ok(logout.includes('toast.loading("Signing out…",'));
+  assert.ok(logout.includes("signOut({ redirect: false })"));
+  assert.ok(sidebar.includes("isLoggingOut"));
+  assert.ok(topbar.includes("isLoggingOut"));
+  assert.ok(login.includes('searchParams.set("loggedIn", "1")'));
+  assert.ok(authToast.includes('signedOut === "partial"'));
+  assert.ok(authToast.includes('signedOut === "1"'));
+  assert.ok(authToast.includes('passwordChanged") === "1"'));
+  assert.ok(authToast.includes('position: "top-center"'));
 });

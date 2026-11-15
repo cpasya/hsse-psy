@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { KeyRound, ShieldCheck } from "lucide-react";
 
 import { StatusBadge } from "@/components/shared/status-badge";
-import { ChangePasswordForm } from "@/features/auth/components/change-password-form";
 import { getCompany } from "@/features/companies/api";
 import { getDepartment } from "@/features/departments/api";
 import { getJobPosition } from "@/features/job-positions/api";
@@ -197,22 +196,20 @@ export function ProfilePage({ user }: { user: UserDTO }) {
         </section>
 
         <section
-          className="card profile-panel profile-password"
+          className="card profile-panel"
           aria-labelledby="password-title"
         >
           <div className="profile-panel-heading">
             <div>
               <p className="eyebrow">SECURITY</p>
-              <h2 id="password-title">Change password</h2>
+              <h2 id="password-title">Password management</h2>
               <p className="muted">
-                After a successful change, all sessions are revoked and you
-                must sign in again.
+                Regular password changes are not available yet. Initial
+                password changes are handled during your first sign-in.
               </p>
             </div>
             <KeyRound size={22} aria-hidden="true" />
           </div>
-
-          <ChangePasswordForm />
         </section>
       </div>
     </>

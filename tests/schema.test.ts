@@ -22,6 +22,7 @@ import {
   loginSchema,
 } from "../src/features/auth/schemas";
 import { cachedProfile } from "../src/lib/profile-cache";
+import { authErrorMessage } from "../src/features/auth/error-message";
 
 const me = {
   id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
@@ -62,6 +63,14 @@ test("Zod resolver maps login validation errors", async () => {
 
   assert.equal(result.errors.email?.message, "Invalid email address");
   assert.equal(result.errors.password?.message, "Password is required");
+});
+
+test("Authentication errors preserve the backend message", () => {
+  assert.equal(
+    authErrorMessage({ status: 409, message: "Password conflict", data: null }),
+    "Password conflict",
+  );
+  assert.equal(authErrorMessage({ status: 409, data: null }), null);
 });
 
 test(

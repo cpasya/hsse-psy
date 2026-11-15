@@ -8,6 +8,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   ShieldCheck,
   LogOut,
+  Loader2,
   PanelLeftClose,
   PanelLeftOpen,
   X,
@@ -21,17 +22,18 @@ import { initials, cn } from "@/lib/utils";
 
 import { useUIStore } from "@/store/ui-store";
 
-import { signOut } from "next-auth/react";
-import { toast } from "sonner";
 import {
   employeeListQuery,
   initialEmployeeFilters,
 } from "@/features/users/employee-list-query";
+import { useLogout } from "@/features/auth/use-logout";
+import Image from "next/image";
 
 export function Sidebar({ user }: { user: UserDTO }) {
   const path = usePathname();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { isLoggingOut, logout } = useLogout();
 
   const { collapsed, mobileOpen, toggle, setMobile } = useUIStore();
 
@@ -91,20 +93,6 @@ export function Sidebar({ user }: { user: UserDTO }) {
     };
   }, [mobileOpen, setMobile]);
 
-  async function exit() {
-    try {
-      const response = await fetch("/api/session/logout", { method: "POST" });
-
-      if (!response.ok) {
-        toast.warning("Local session closed; server token revocation failed.");
-      }
-    } finally {
-      await signOut({
-        callbackUrl: "/login",
-      });
-    }
-  }
-
   return (
     <>
       {mobileOpen && (
@@ -122,14 +110,20 @@ export function Sidebar({ user }: { user: UserDTO }) {
         aria-label="Primary navigation"
       >
         <div className="sidebar-brand">
-          <Link href="/dashboard" className="brand" aria-label="HSSE Dashboard">
-            <span className="brand-mark">
-              <ShieldCheck size={25} />
+          <Link href="/dashboard" className="brand" aria-label="SHIELD Dashboard">
+            <span className="sidebar-logo" aria-hidden="true">
+              <Image
+                src="/brand/shield-dashboard-logo.png"
+                alt=""
+                width={60}
+                height={50}
+                priority
+              />
             </span>
 
             <span className="nav-label">
-              <strong>HSSE</strong>
-              <small>Management Dashboard</small>
+              <strong>SAFETY &amp; HEALTH - INTEGRATED ELECTRONIC LIVE DATABASE</strong>
+              {/* <small>Management Dashboard</small> */}
             </span>
           </Link>
 
@@ -143,7 +137,7 @@ export function Sidebar({ user }: { user: UserDTO }) {
         </div>
 
         <nav>
-          {["Home", "Operational HSSE", "Administration"].map((group) => {
+          {["Home", "Operational SHIELD", "Administration"].map((group) => {
             const items = getNavItems(user).filter(
               (item) => item.group === group,
             );
@@ -212,12 +206,19 @@ export function Sidebar({ user }: { user: UserDTO }) {
 
           <button
             className="nav-item logout"
-            aria-label="Sign out"
-            onClick={exit}
+            aria-label={isLoggingOut ? "Signing out" : "Sign out"}
+            disabled={isLoggingOut}
+            onClick={() => void logout()}
           >
-            <LogOut size={18} />
+            {isLoggingOut ? (
+              <Loader2 size={18} className="spin" />
+            ) : (
+              <LogOut size={18} />
+            )}
 
-            <span className="nav-label">Sign out</span>
+            <span className="nav-label">
+              {isLoggingOut ? "Signing out…" : "Sign out"}
+            </span>
           </button>
 
           <button

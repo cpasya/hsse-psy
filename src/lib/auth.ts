@@ -21,7 +21,7 @@ export const authOptions: NextAuthOptions = {
 
   providers: [
     CredentialsProvider({
-      name: "HSSE",
+      name: "SHIELD",
 
       credentials: {
         email: {

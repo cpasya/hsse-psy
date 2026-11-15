@@ -8,6 +8,7 @@ import { cachedProfile } from "@/lib/profile-cache";
 import { authTokensSchema } from "./schemas";
 import type { ChangePasswordInput } from "./schemas";
 import { toFrontendProfile } from "./backend-profile";
+import { authErrorMessage } from "./error-message";
 
 import type { UserDTO } from "@/features/users/types";
 
@@ -74,32 +75,42 @@ async function authRequest(
     );
   }
 
+  const text = await response.text();
+  let json: unknown = null;
+
+  if (text) {
+    try {
+      json = JSON.parse(text);
+    } catch {
+      if (!response.ok) {
+        throw new AuthApiError(
+          response.status,
+          `Authentication service failed (${response.status})`,
+        );
+      }
+
+      throw new AuthApiError(
+        502,
+        "Invalid authentication response",
+      );
+    }
+  }
+
   if (!response.ok) {
     throw new AuthApiError(
       response.status,
-
-      response.status === 401 ||
-        response.status === 403
-        ? "Authentication was rejected. Check your account or sign in again."
-        : `Authentication service failed (${response.status})`,
+      authErrorMessage(json) ??
+        (
+          response.status === 401 ||
+          response.status === 403
+            ? "Authentication was rejected. Check your account or sign in again."
+            : `Authentication service failed (${response.status})`
+        ),
     );
   }
-
-  const text = await response.text();
 
   if (!text) {
     return null;
-  }
-
-  let json: unknown;
-
-  try {
-    json = JSON.parse(text);
-  } catch {
-    throw new AuthApiError(
-      502,
-      "Invalid authentication response",
-    );
   }
 
   // Mendukung respons langsung maupun envelope data.

@@ -7,7 +7,7 @@ export default async function Page() {
   const { allowed } = await requirePermission("audit:view");
   return allowed ? (
     <ModulePlaceholder
-      title="HSSE Audit"
+      title="SHIELD Audit"
       description="Safety audits and findings follow-up."
     />
   ) : (

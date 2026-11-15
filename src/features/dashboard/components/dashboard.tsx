@@ -35,9 +35,9 @@ export function Dashboard({ data }: { data?: DashboardSnapshot }) {
     <>
       <div className="page-heading">
         <div>
-          <p className="eyebrow">OVERVIEW / HSSE PERFORMANCE</p>
+          <p className="eyebrow">OVERVIEW / SHIELD PERFORMANCE</p>
           <h1>
-            Dashboard HSSE<span className="heading-dot">.</span>
+            Dashboard SHIELD<span className="heading-dot">.</span>
           </h1>
           <p className="muted">
             Operational summary from verified data sources.

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { getSession, signIn } from "next-auth/react";
-import { Eye, EyeOff, ArrowRight, Loader2, AlertCircle } from "lucide-react";
+import { Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
 import { loginSchema } from "../schemas";
 import { LoginPayload } from "../types";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ export function LoginForm() {
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
   });
+
   async function submit(data: LoginPayload) {
     setError("");
     try {
@@ -49,10 +50,16 @@ export function LoginForm() {
 
       const session = await getSession();
 
-      location.assign(
+      const destination = new URL(
         session?.user.mustachePassword
           ? "/change-password"
           : callbackUrl,
+        location.origin,
+      );
+
+      destination.searchParams.set("loggedIn", "1");
+      location.assign(
+        `${destination.pathname}${destination.search}${destination.hash}`,
       );
     } catch {
       setError("The server could not be reached. Please try again.");
@@ -66,7 +73,7 @@ export function LoginForm() {
           id="email"
           type="email"
           autoComplete="username"
-          placeholder="name@company.com"
+          placeholder="Enter your email"
           disabled={isSubmitting}
           aria-invalid={!!errors.email}
           {...register("email")}
@@ -107,8 +114,7 @@ export function LoginForm() {
       )}
       <Button className="full" disabled={isSubmitting}>
         {isSubmitting ? <Loader2 size={18} className="spin" /> : null}
-        {isSubmitting ? "Signing in…" : "Sign in to Dashboard"}
-        <ArrowRight size={18} />
+        {isSubmitting ? "Signing in…" : "Sign In"}
       </Button>
     </form>
   );

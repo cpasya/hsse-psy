@@ -18,9 +18,15 @@ test("Employee backend statuses have explicit semantic badges", () => {
 
 test("TailAdmin adaptation retains notices, responsive and keyboard foundations", () => {
   const css = readFileSync("src/app/globals.css", "utf8");
+  const layout = readFileSync("src/app/layout.tsx", "utf8");
   assert.ok(css.includes("prefers-reduced-motion"));
-  assert.ok(css.includes("prefers-color-scheme: dark"));
+  assert.ok(!css.includes("prefers-color-scheme: dark"));
   assert.ok(css.includes("html.dark"));
+  assert.ok(layout.includes('const dark = theme === "dark"'));
+  assert.ok(css.includes("--button-primary: #0000ff"));
+  assert.ok(css.includes(".nav-item.active:hover"));
+  assert.ok(css.includes("background: #0000ff"));
+  assert.ok(css.includes('url("/brand/shield-dashboard-bg.png")'));
   assert.ok(css.includes(".table-scroll"));
   assert.ok(css.includes(":focus-visible"));
   assert.ok(existsSync("licenses/TailAdmin-MIT.txt"));
@@ -32,6 +38,8 @@ test("TailAdmin adaptation retains notices, responsive and keyboard foundations"
   assert.ok(sidebar.includes('event.key === "Escape"'));
   assert.ok(sidebar.includes("body.inert = true"));
   assert.ok(sidebar.includes("user.image"));
+  assert.ok(sidebar.includes('className="sidebar-logo"'));
+  assert.ok(css.includes("flex: 0 0 var(--sidebar-logo-width)"));
   assert.ok(
     readFileSync("src/components/layout/topbar.tsx", "utf8").includes(
       "user.image",

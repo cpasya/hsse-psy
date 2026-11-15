@@ -57,6 +57,9 @@ test(
     const form = text(
       "src/features/auth/components/change-password-form.tsx",
     );
+    const page = text(
+      "src/app/(auth)/change-password/page.tsx",
+    );
 
     assert.ok(
       api.includes(
@@ -70,6 +73,8 @@ test(
     );
     assert.ok(route.includes("token.accessToken"));
     assert.equal(form.includes("accessToken"), false);
+    assert.ok(page.includes("ChangePasswordForm"));
+    assert.ok(page.includes('className="login-layout login-page password-page"'));
   },
 );
 

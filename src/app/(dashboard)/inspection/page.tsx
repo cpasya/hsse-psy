@@ -7,7 +7,7 @@ export default async function Page() {
   const { allowed } = await requirePermission("inspection:view");
   return allowed ? (
     <ModulePlaceholder
-      title="HSSE Inspection"
+      title="SHIELD Inspection"
       description="Periodic inspections of work areas and equipment."
     />
   ) : (

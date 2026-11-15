@@ -4,6 +4,7 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { signOut } from "next-auth/react";
+import { toast } from "sonner";
 import {
   AlertCircle,
   Eye,
@@ -63,11 +64,12 @@ export function ChangePasswordForm() {
       await signOut({ redirect: false });
       location.assign("/login?passwordChanged=1");
     } catch (caught) {
-      setError(
-        caught instanceof Error
-          ? caught.message
-          : "The server could not be reached",
-      );
+      const message = caught instanceof Error
+        ? caught.message
+        : "The server could not be reached";
+
+      setError(message);
+      toast.error(message);
     }
   }
 

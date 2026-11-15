@@ -117,7 +117,11 @@ export function DepartmentsPage() {
       toast.success("Department saved");
       await refresh();
     },
-    onError: (error) => setFormError(errorMessage(error)),
+    onError: (error) => {
+      const message = errorMessage(error);
+      setFormError(message);
+      toast.error(message);
+    },
   });
 
   const remove = useMutation({
@@ -179,7 +183,7 @@ export function DepartmentsPage() {
         <div>
           <p className="eyebrow">ADMINISTRATION</p>
           <h1>Departments</h1>
-          <p className="muted">Department master data from the HSSE backend.</p>
+          <p className="muted">Department master data from the SHIELD backend.</p>
         </div>
 
         {can(user, "departments.create") && (

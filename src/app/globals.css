@@ -15,6 +15,8 @@
   --primary: #465fff;
   --primary-hover: #3641f5;
   --primary-soft: #ecf3ff;
+  --button-primary: #0000ff;
+  --button-primary-hover: #3333ff;
   --success: #027a48;
   --success-soft: #ecfdf3;
   --danger: #b42318;
@@ -203,13 +205,13 @@ fieldset {
   line-height: 1.5;
   white-space: nowrap;
   transition: background 0.15s;
-  background: var(--primary);
+  background: var(--button-primary);
   color: #fff;
   box-shadow: var(--shadow);
 }
 
 .btn:hover:not(:disabled) {
-  background: var(--primary-hover);
+  background: var(--button-primary-hover);
 }
 
 .btn-outline {
@@ -300,15 +302,33 @@ fieldset {
   min-height: 64px;
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px;
+  justify-content: space-evenly;
+  /* gap: 2px; */
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 2px;
   min-width: 0;
+}
+
+.sidebar-logo {
+  --sidebar-logo-width: 60px;
+  --sidebar-logo-height: 50px;
+  display: inline-flex;
+  width: var(--sidebar-logo-width);
+  height: var(--sidebar-logo-height);
+  flex: 0 0 var(--sidebar-logo-width);
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .brand-mark {
@@ -324,11 +344,12 @@ fieldset {
 }
 
 .brand strong {
-  font-size: 24px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: -0.6px;
   line-height: 1.15;
   display: block;
+  text-align: center;
 }
 
 .brand small {
@@ -380,14 +401,19 @@ fieldset {
 }
 
 .nav-item:hover {
-  color: var(--foreground);
-  background: var(--soft);
+  color: #0000cc;
+  background: rgba(0, 0, 255, 0.08);
 }
 
 .nav-item.active {
-  color: #3641f5;
-  background: var(--primary-soft);
+  color: #fff;
+  background: #0000ff;
   font-weight: 600;
+}
+
+.nav-item.active:hover {
+  color: #fff;
+  background: #3333ff;
 }
 
 .nav-label {
@@ -627,6 +653,7 @@ fieldset {
     opacity: 0;
     transform: translateY(-6px) scale(0.98);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -638,6 +665,7 @@ fieldset {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+
   to {
     opacity: 0;
     transform: translateY(-4px) scale(0.98);
@@ -671,6 +699,13 @@ fieldset {
   padding: 32px;
   flex: 1;
   min-width: 0;
+  background: url("/brand/shield-dashboard-bg.png") center / cover no-repeat;
+}
+
+html.dark .main-content {
+  background-image:
+    linear-gradient(rgba(16, 24, 40, 0.88), rgba(16, 24, 40, 0.88)),
+    url("/brand/shield-dashboard-bg.png");
 }
 
 .app-footer {
@@ -1516,6 +1551,196 @@ tbody tr:hover {
   font-size: 12px;
 }
 
+/* KUFPEC auth layout shared by sign-in and initial password change. */
+.login-page {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  background: #fff;
+}
+
+.login-page .login-form-area {
+  grid-column: 2;
+  padding: clamp(40px, 6vw, 88px);
+  background: #fff;
+}
+
+.login-page .login-form-wrap {
+  max-width: 420px;
+}
+
+.login-mobile-brand {
+  display: none;
+}
+
+.login-safety-line {
+  margin-bottom: clamp(48px, 7vh, 76px);
+  color: #0561fc;
+  font-size: clamp(20px, 1.2vw, 18px);
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  white-space: nowrap;
+}
+
+.login-page .login-form-wrap h1 {
+  margin-bottom: 10px;
+  color: #101828;
+  font-size: clamp(34px, 3vw, 42px);
+  letter-spacing: -1.5px;
+}
+
+.login-page .login-form-wrap>.muted {
+  color: #52698f;
+  font-size: 16px;
+}
+
+.login-page .login-form {
+  gap: 22px;
+  margin-top: 34px;
+}
+
+.login-page .login-form .field label {
+  margin-bottom: 10px;
+  color: #101828;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.login-page .login-form input {
+  min-height: 52px;
+  border-color: #cbd8e8;
+  border-radius: 10px;
+  background: #fff;
+  color: #101828;
+  font-size: 16px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.03);
+}
+
+.login-page .login-form input::placeholder {
+  color: #7588a8;
+}
+
+.login-page .login-form input:focus {
+  border-color: #1473e6;
+  box-shadow: 0 0 0 4px rgba(20, 115, 230, 0.11);
+}
+
+.login-page .input-icon .icon-btn {
+  top: 3px;
+  right: 7px;
+  color: #52698f;
+}
+
+.login-page .login-form .btn {
+  min-height: 52px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--button-primary);
+  box-shadow: 0 12px 24px rgba(8, 111, 242, 0.2);
+  font-size: 16px;
+}
+
+.login-page .login-form .btn:hover:not(:disabled) {
+  background: var(--button-primary-hover);
+  box-shadow: 0 14px 28px rgba(8, 111, 242, 0.26);
+}
+
+.login-page .login-help {
+  border-top-color: #e4eaf2;
+  color: #64748b;
+}
+
+.login-page .login-copyright {
+  color: #7b8ba5;
+}
+
+.login-page .login-brand-panel {
+  grid-column: 1;
+  padding: clamp(48px, 5vw, 80px);
+  background-color: #f4f7fb;
+  background-image: url("/brand/soft-blue-bg.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  color: #0b2550;
+}
+
+.login-brand-panel::before,
+.login-brand-panel::after {
+  display: none;
+}
+
+.login-brand-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: min(100%, 690px);
+  height: 100%;
+  min-height: 640px;
+  flex-direction: column;
+  align-items: center;
+}
+
+.kufpec-logo {
+  width: clamp(128px, 12vw, 165px);
+  height: auto;
+  align-self: flex-start;
+  object-fit: contain;
+}
+
+.login-brand-message {
+  display: flex;
+  max-width: 610px;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: clamp(72px, 10vh, 112px);
+  text-align: center;
+}
+
+.login-brand-message h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: clamp(14px, 1.25vw, 19px);
+  font-weight: 700;
+  letter-spacing: 0.035em;
+  line-height: 1.5;
+}
+
+.password-page .login-safety-line {
+  margin-bottom: clamp(28px, 4vh, 44px);
+}
+
+.password-page .login-form {
+  gap: 18px;
+  margin-top: 28px;
+}
+
+.dark .login-page,
+.dark .login-page .login-form-area {
+  background: #111827;
+}
+
+.dark .login-page .login-form-wrap h1,
+.dark .login-page .login-form .field label {
+  color: #f8fafc;
+}
+
+.dark .login-page .login-form-wrap>.muted,
+.dark .login-page .login-help,
+.dark .login-page .login-copyright {
+  color: #a7b5ca;
+}
+
+.dark .login-page .login-form input {
+  border-color: #3b4b63;
+  background: #182235;
+  color: #f8fafc;
+}
+
+.dark .login-page .login-brand-panel {
+  background-color: #e9eef5;
+}
+
 .spin {
   animation: spin 0.8s linear infinite;
 }
@@ -1625,6 +1850,26 @@ tbody tr:hover {
 
   .login-form-area {
     min-height: 100dvh;
+  }
+
+  .login-page .login-form-area {
+    grid-column: 1;
+  }
+
+  .login-page .login-mobile-brand {
+    display: block;
+    width: 150px;
+    margin-bottom: 52px;
+  }
+
+  .login-mobile-brand img {
+    width: 100%;
+    height: auto;
+  }
+
+  .login-page .login-safety-line {
+    margin-bottom: 42px;
+    white-space: normal;
   }
 
   .analytics-grid {
@@ -1813,6 +2058,25 @@ tbody tr:hover {
     padding: 40px 24px 24px;
   }
 
+  .login-page .login-form-area {
+    padding: 36px 24px 24px;
+  }
+
+  .login-page .login-mobile-brand {
+    width: 135px;
+    margin-bottom: 40px;
+  }
+
+  .login-page .login-safety-line {
+    margin-bottom: 32px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .login-page .login-form {
+    margin-top: 32px;
+  }
+
   .login-form-wrap .brand {
     margin-bottom: 48px;
   }
@@ -1851,35 +2115,6 @@ html.dark {
 html.dark .nav-item.active,
 html.dark .avatar {
   color: #b2ccff;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not(.light) {
-    color-scheme: dark;
-    --canvas: #101828;
-    --surface: #1a2231;
-    --foreground: #f2f4f7;
-    --muted: #b3bed0;
-    --border: #344054;
-    --input: #667085;
-    --primary: #465fff;
-    --primary-hover: #3641f5;
-    --primary-soft: #252e54;
-    --soft: #263142;
-    --success: #75e0a7;
-    --success-soft: #153c30;
-    --danger: #fda29b;
-    --danger-soft: #492a2b;
-    --warning: #fec84b;
-    --warning-soft: #493820;
-    --info: #b2ccff;
-    --info-soft: #243860;
-  }
-
-  :root:not(.light) .nav-item.active,
-  :root:not(.light) .avatar {
-    color: #b2ccff;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2008,11 +2243,6 @@ html.dark .avatar {
 
 .profile-access-table {
   min-width: 520px;
-}
-
-.profile-password .login-form {
-  max-width: 680px;
-  margin-top: 0;
 }
 
 @media (max-width: 767px) {

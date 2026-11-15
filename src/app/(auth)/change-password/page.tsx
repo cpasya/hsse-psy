@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { LockKeyhole, ShieldCheck } from "lucide-react";
+import Image from "next/image";
 
 import { ChangePasswordForm } from "@/features/auth/components/change-password-form";
 import { authOptions } from "@/lib/auth";
@@ -21,25 +21,24 @@ export default async function ChangePasswordPage() {
   }
 
   return (
-    <main className="login-layout">
+    <main className="login-layout login-page password-page">
       <section
         className="login-form-area"
         aria-labelledby="change-password-title"
       >
         <div className="login-form-wrap">
-          <div className="brand" aria-label="HSSE Management System">
-            <span className="brand-mark">
-              <ShieldCheck size={24} />
-            </span>
-            <div>
-              <strong>HSSE</strong>
-              <small>Management System</small>
-            </div>
+          <div className="login-mobile-brand">
+            <Image
+              src="/brand/kufpec-logo.png"
+              alt="KUFPEC"
+              width={494}
+              height={199}
+              priority
+            />
           </div>
 
-          <h1 id="change-password-title">
-            Create a new password
-          </h1>
+          <p className="login-safety-line">SECURE YOUR ACCOUNT</p>
+          <h1 id="change-password-title">Create a new password</h1>
           <p className="muted">
             The initial password is only used for your first sign-in.
             After it is changed, please sign in again.
@@ -49,19 +48,24 @@ export default async function ChangePasswordPage() {
         </div>
       </section>
 
-      <section className="login-story" aria-label="Account security">
-        <div className="story-copy">
-          <LockKeyhole size={40} />
-          <p className="eyebrow">ACCOUNT SECURITY</p>
-          <h2>
-            New password.
-            <br />
-            More secure access.
-          </h2>
-          <p>
-            Do not reuse the initial password or share your password with
-            anyone.
-          </p>
+      <section
+        className="login-story login-brand-panel"
+        aria-label="Account security"
+      >
+        <div className="login-brand-content">
+          <Image
+            className="kufpec-logo"
+            src="/brand/kufpec-logo.png"
+            alt="KUFPEC"
+            width={494}
+            height={199}
+            priority
+          />
+
+          <div className="login-brand-message">
+            <h1 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '75px' }} >SAFETY &amp; HEALTH - INTEGRATED ELECTRONIC LIVE DATABASE</h1>
+            <Image src="/brand/SHIELD-KUFPEC.png" alt="KUFPEC" width={350} height={350} priority />
+          </div>
         </div>
       </section>
     </main>

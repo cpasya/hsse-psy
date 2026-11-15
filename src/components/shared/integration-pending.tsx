@@ -12,7 +12,7 @@ export function IntegrationPending({
     <>
       <div className="page-heading">
         <div>
-          <p className="eyebrow">WORKSPACE HSSE</p>
+          <p className="eyebrow">SHIELD</p>
           <h1>{title}</h1>
           <p className="muted">{description}</p>
         </div>

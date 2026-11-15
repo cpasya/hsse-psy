@@ -7,7 +7,7 @@ export default async function Page() {
   const { allowed } = await requirePermission("meeting:view");
   return allowed ? (
     <ModulePlaceholder
-      title="HSSE Meeting"
+      title="SHIELD Meeting"
       description="Safety meeting schedules, attendance, and minutes."
     />
   ) : (
